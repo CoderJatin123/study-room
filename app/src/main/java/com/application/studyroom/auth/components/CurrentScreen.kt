@@ -1,4 +1,4 @@
-package com.application.studyroom.auth_ui
+package com.application.studyroom.auth.components
 
 enum class CurrentScreen {
     BOARDING_SCREEN,

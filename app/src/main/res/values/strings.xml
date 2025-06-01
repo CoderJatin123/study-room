@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Study Room</string>
     <string name="title_activity_auth">AuthActivity</string>
+    <string name="default_web_client_id">1002182632973-6shqdc5n40h77cbaefnmhorgvupu80o9.apps.googleusercontent.com</string>
     <string name="hero_text_boarding_screen">
         StudyRoom lets you join rooms, get real-time notifications, and access all your study materials in one place—making learning organized, connected, and easy.
     </string>
