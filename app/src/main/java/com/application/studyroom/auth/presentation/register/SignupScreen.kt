@@ -1,6 +1,8 @@
 package com.application.studyroom.auth.presentation.register
 
+import android.content.Intent
 import android.util.Log
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,7 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.application.studyroom.MainActivity
 import com.application.studyroom.R
+import com.application.studyroom.auth.components.AuthActivity
 import com.application.studyroom.ui.StudyRoomTheme
 import com.application.studyroom.ui.theme.ButtonText
 import com.application.studyroom.ui.theme.MyButton
@@ -59,9 +64,9 @@ import kotlinx.coroutines.flow.update
 @Composable
 fun SignupScreen(
     modifier: Modifier = Modifier, navHostController: NavHostController,
-    viewModel: AuthViewModel = AuthViewModel()
+    viewModel: SignupViewModel = SignupViewModel()
 ) {
-
+    val activity = LocalActivity.current as AuthActivity
     val email by viewModel.email.collectAsState()
     val emailError by viewModel.emailError.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -282,8 +287,11 @@ fun SignupScreen(
                 isEmailFocused = true
                 isTermFocused = true
 
-                viewModel.validateAllField()
-                viewModel._isLoading.update { true }
+                viewModel.signup { isSuccess->
+                        if(isSuccess){
+                            activity.onAuthCompleted()
+                        }
+                }
 
             }
 

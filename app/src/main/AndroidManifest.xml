@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StudyRoom"
         tools:targetApi="31">
+        <activity android:name=".MainActivity"
+            android:label="Home"
+            />
         <activity
             android:name=".auth.components.AuthActivity"
             android:exported="true"
