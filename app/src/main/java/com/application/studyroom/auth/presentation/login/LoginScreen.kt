@@ -1,14 +1,17 @@
 package com.application.studyroom.auth.presentation.login
 
+import android.app.Activity.RESULT_OK
 import android.util.Log
 import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,7 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,7 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,32 +49,31 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.credentials.Credential
-import androidx.credentials.CustomCredential
-import androidx.credentials.GetCredentialRequest
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.lifecycleScope
 import com.application.studyroom.R
 import com.application.studyroom.auth.components.AuthActivity
-import com.application.studyroom.auth.components.AuthViewModel
+import com.application.studyroom.auth.domain.GoogleAuth
 import com.application.studyroom.ui.StudyRoomTheme
 import com.application.studyroom.ui.theme.ButtonText
 import com.application.studyroom.ui.theme.MyButton
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
-import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
-import com.google.firebase.Firebase
-import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.auth
-import kotlinx.coroutines.flow.update
+import com.google.android.gms.auth.api.identity.Identity
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun LoginScreen(modifier: Modifier = Modifier, navHostController: NavHostController,
-                viewModel: LoginViewModel = LoginViewModel()) {
-
+fun LoginScreen(
+    modifier: Modifier = Modifier,
+    viewModel: LoginViewModel = LoginViewModel()
+) {
     val activity = (LocalActivity.current as AuthActivity)
+
+    val googleAuthUiClient by lazy {
+        GoogleAuth(
+            context = activity.applicationContext,
+            oneTapClient = Identity.getSignInClient(activity.applicationContext)
+        )
+    }
+
     val email by viewModel.email.collectAsState()
     val emailError by viewModel.emailError.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -85,6 +85,21 @@ fun LoginScreen(modifier: Modifier = Modifier, navHostController: NavHostControl
     var isEmailFocused by remember { mutableStateOf(false) }
     var isPasswordFocused by remember { mutableStateOf(false) }
 
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+        onResult = { result ->
+            if (result.resultCode == RESULT_OK) {
+                activity.lifecycleScope.launch {
+                    val signInResult = googleAuthUiClient.signInWithIntent(
+                        intent = result.data ?: return@launch
+                    )
+                    if (signInResult.data != null) {
+                        activity.onAuthCompleted()
+                    }
+                }
+            }
+        }
+    )
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -110,6 +125,7 @@ fun LoginScreen(modifier: Modifier = Modifier, navHostController: NavHostControl
                 text = "Continue with old chapter",
                 color = colorResource(R.color.green_dark)
             )
+
             Text(
                 text = "Login to your an account",
                 modifier = Modifier.padding(top = 2.dp, bottom = 22.dp, start = 2.dp),
@@ -155,7 +171,6 @@ fun LoginScreen(modifier: Modifier = Modifier, navHostController: NavHostControl
                         modifier = Modifier.padding(start = 4.dp),
                         fontSize = 14.sp
                     )
-
                 }
 
                 TextField(
@@ -213,21 +228,30 @@ fun LoginScreen(modifier: Modifier = Modifier, navHostController: NavHostControl
                     isEmailFocused = true
                     isEmailFocused = true
 
-                     viewModel.login {
-                         if (it) {
-                             activity.onAuthCompleted()
-                         }
-                     }
+                    viewModel.login {
+                        if (it) {
+                            activity.onAuthCompleted()
+                        }
+                    }
                 })
 
                 Text("OR", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
                 OutlinedButton(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(15), onClick = {
+                    shape = RoundedCornerShape(15),
+                    onClick = {
 
+                        activity.lifecycleScope.launch {
+                            val signInIntentSender = googleAuthUiClient.signIn()
+                            launcher.launch(
+                                IntentSenderRequest.Builder(
+                                    signInIntentSender ?: return@launch
+                                ).build()
+                            )
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
+                        containerColor = Color.Transparent,
                         contentColor = colorResource(R.color.gray),
                     ), border = BorderStroke(1.dp, colorResource(R.color.gray))
                 ) {
@@ -239,7 +263,9 @@ fun LoginScreen(modifier: Modifier = Modifier, navHostController: NavHostControl
                     )
                 }
                 TextButton(
-                    onClick = {},
+                    onClick = {
+
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .align(Alignment.CenterHorizontally),
@@ -261,7 +287,7 @@ fun LoginScreen(modifier: Modifier = Modifier, navHostController: NavHostControl
                 Box(
                     modifier = Modifier
                         .matchParentSize()
-                        .background(Color.Black.copy(alpha = 0.2f)) // semi-transparent background
+                        .background(Color.Black.copy(alpha = 0.2f))
                         .pointerInput(Unit) {},
                     contentAlignment = Alignment.Center
                 ) {
@@ -270,40 +296,12 @@ fun LoginScreen(modifier: Modifier = Modifier, navHostController: NavHostControl
             }
         }
     }
-    }
+}
 
 @Preview(showBackground = true)
 @Composable
 fun LoginPreview() {
     StudyRoomTheme {
-        LoginScreen(navHostController = rememberNavController())
+        LoginScreen()
     }
 }
-fun handleSignIn(credential: Credential) {
-    // Check if credential is of type Google ID
-    if (credential is CustomCredential && credential.type == TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-        // Create Google ID Token
-        val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
-
-        // Sign in to Firebase with using the token
-        val credential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
-        Firebase.auth.signInWithCredential(credential)
-            .addOnCompleteListener() { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d("TAG", "signInWithCredential:success: ")
-                    val user = Firebase.auth.currentUser
-
-                } else {
-                    // If sign in fails, display a message to the user
-                    Log.d("TAG", "signInWithCredential:failure", task.exception)
-                }
-            }
-    } else {
-        Log.w("TAG", "Credential is not of type Google ID!")
-    }
-}
-
-
-
-

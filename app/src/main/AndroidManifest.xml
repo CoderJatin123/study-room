@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -12,9 +14,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.StudyRoom"
         tools:targetApi="31">
-        <activity android:name=".MainActivity"
-            android:label="Home"
-            />
+        <activity
+            android:name=".room.create.components.CreateRoomActivity"
+            android:exported="false"
+            android:label="@string/title_activity_create_room"
+            android:theme="@style/Theme.StudyRoom" />
+        <activity
+            android:name=".room.create.componenets.CreateRoomActivity"
+            android:exported="false"
+            android:label="@string/title_activity_create_room"
+            android:theme="@style/Theme.StudyRoom" />
+        <activity
+            android:name=".main.components.MainActivity"
+            android:label="Home" />
         <activity
             android:name=".auth.components.AuthActivity"
             android:exported="true"

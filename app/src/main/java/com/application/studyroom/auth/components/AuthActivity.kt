@@ -2,7 +2,6 @@ package com.application.studyroom.auth.components
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.setContent
@@ -15,7 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.application.studyroom.MainActivity
+import com.application.studyroom.main.components.MainActivity
 import com.application.studyroom.auth.domain.AuthRepository
 import com.application.studyroom.auth.presentation.login.LoginScreen
 import com.application.studyroom.auth.presentation.register.SignupScreen
@@ -37,6 +36,7 @@ class AuthActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        //Log.d("TAG", "onCreate: "+AuthRepository.currentUser)
         setContent {
             StudyRoomTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -57,14 +57,14 @@ class AuthActivity : ComponentActivity() {
                             SignupScreen(
                                 modifier = Modifier
                                     .padding(innerPadding)
-                                    .fillMaxSize(), controller, signupViewModel)
+                                    .fillMaxSize(), signupViewModel)
                         }
                         composable<LoginScreen> {
                             val loginViewModel = ViewModelProvider(LocalActivity.current as AuthActivity)[LoginViewModel::class.java]
                             LoginScreen(
                                 modifier = Modifier
                                     .padding(innerPadding)
-                                    .fillMaxSize(), controller,loginViewModel)
+                                    .fillMaxSize(),loginViewModel)
                         }
                     }
                 }

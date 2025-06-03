@@ -1,8 +1,10 @@
 package com.application.studyroom.auth.presentation.register
 
-import android.content.Intent
-import android.util.Log
+import android.app.Activity.RESULT_OK
 import androidx.activity.compose.LocalActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -35,12 +37,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,23 +50,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
-import com.application.studyroom.MainActivity
+import androidx.lifecycle.lifecycleScope
 import com.application.studyroom.R
 import com.application.studyroom.auth.components.AuthActivity
 import com.application.studyroom.ui.StudyRoomTheme
 import com.application.studyroom.ui.theme.ButtonText
 import com.application.studyroom.ui.theme.MyButton
-import com.application.studyroom.auth.components.AuthViewModel
-import kotlinx.coroutines.flow.update
+import com.application.studyroom.auth.domain.GoogleAuth
+import com.google.android.gms.auth.api.identity.Identity
+import kotlinx.coroutines.launch
 
 @Composable
 fun SignupScreen(
-    modifier: Modifier = Modifier, navHostController: NavHostController,
+    modifier: Modifier = Modifier,
     viewModel: SignupViewModel = SignupViewModel()
 ) {
-    val activity = LocalActivity.current as AuthActivity
+    val activity = (LocalActivity.current as AuthActivity)
+
+    val googleAuthUiClient by lazy {
+        GoogleAuth(
+            context = activity.applicationContext,
+            oneTapClient = Identity.getSignInClient(activity.applicationContext)
+        )
+    }
+
     val email by viewModel.email.collectAsState()
     val emailError by viewModel.emailError.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -84,6 +91,21 @@ fun SignupScreen(
     var isCoPasswordFocused by remember { mutableStateOf(false) }
     var isTermFocused by remember { mutableStateOf(false) }
 
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+        onResult = { result ->
+            if(result.resultCode == RESULT_OK) {
+                activity.lifecycleScope.launch {
+                    val signInResult = googleAuthUiClient.signInWithIntent(
+                        intent = result.data ?: return@launch
+                    )
+                    if(signInResult.data!=null){
+                        activity.onAuthCompleted()
+                    }
+                }
+            }
+        }
+    )
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -298,11 +320,19 @@ fun SignupScreen(
             Text("OR", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
             OutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(15), onClick = {
-
+                shape = RoundedCornerShape(15),
+                onClick = {
+                    activity.lifecycleScope.launch {
+                        val signInIntentSender = googleAuthUiClient.signIn()
+                        launcher.launch(
+                            IntentSenderRequest.Builder(
+                                signInIntentSender ?: return@launch
+                            ).build()
+                        )
+                    }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
+                    containerColor = Color.Transparent,
                     contentColor = colorResource(R.color.gray),
                 ), border = BorderStroke(1.dp, colorResource(R.color.gray))
             ) {
@@ -348,12 +378,10 @@ fun SignupScreen(
 }
 
 
-
-
 @Preview(showBackground = true)
 @Composable
 fun SignupPreview() {
     StudyRoomTheme {
-        SignupScreen(navHostController = rememberNavController())
+        SignupScreen()
     }
 }
