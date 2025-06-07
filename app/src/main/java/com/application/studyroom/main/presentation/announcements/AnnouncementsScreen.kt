@@ -52,7 +52,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnnouncementsScreen(
     announcements: List<Announcement>,
@@ -69,7 +68,7 @@ fun AnnouncementsScreen(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(announcements) { announcement ->
@@ -88,9 +87,9 @@ fun AnnouncementCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 2.dp),
+            .padding(horizontal = 2.dp, vertical = 2.dp),
         shape = RoundedCornerShape(12.dp),
-        border = BorderStroke(1.2.dp, color = colorResource(R.color.green_dark)),
+        border = BorderStroke(1.2.dp, color = colorResource(R.color.stroke)),
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
         ),
@@ -170,35 +169,24 @@ fun AnnouncementCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Announcement title
-            if (!announcement.title.isNullOrEmpty()) {
-                Text(
-                    text = announcement.title,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-            }
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Announcement description
             if (!announcement.description.isNullOrEmpty()) {
                 Text(
+                    fontSize = 14.sp,
+                    lineHeight = 18.sp,
                     text = announcement.description,
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface,
-                    lineHeight = 22.sp,
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(modifier = Modifier.height(4.dp))
             }
 
             // Attachments (if any)
             if (!announcement.attachments.isNullOrEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
                 AttachmentsSection(attachments = announcement.attachments)
             }
         }

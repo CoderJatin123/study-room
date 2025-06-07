@@ -210,6 +210,7 @@ fun CreateRoomScreen(
                                     Toast.makeText(activity!!.baseContext, "Failed to create room", Toast.LENGTH_SHORT).show()
                                 }else{
                                     Toast.makeText(activity!!.baseContext, "Room created successfully", Toast.LENGTH_SHORT).show()
+                                    activity.finish()
                                 }
                             }
                         }

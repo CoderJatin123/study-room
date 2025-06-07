@@ -65,7 +65,7 @@ class AnnouncementsActivity : ComponentActivity() {
                             id = "1",
                             title = "Welcome to StudyRoom!",
                             description = "Hello everyone! Welcome to our new StudyRoom. This is where we'll share important updates, assignments, and resources throughout the semester. Please make sure to check this space regularly for announcements.",
-                            adminName = "Dr. Sarah Johnson",
+                            adminName = "Jatin Lad",
                             adminPhotoUrl = null,
                             createdAt = System.currentTimeMillis() - 3600000, // 1 hour ago
                             attachments = null
@@ -74,7 +74,7 @@ class AnnouncementsActivity : ComponentActivity() {
                             id = "2",
                             title = "Assignment 1 Due Date Extended",
                             description = "Due to the technical issues we experienced last week, I'm extending the deadline for Assignment 1 to Friday, March 15th at 11:59 PM. Please submit your work through the portal.",
-                            adminName = "Prof. Michael Chen",
+                            adminName = "Jatin Ladn",
                             adminPhotoUrl = null,
                             createdAt = System.currentTimeMillis() - 86400000, // 1 day ago
                             attachments = null
@@ -83,7 +83,7 @@ class AnnouncementsActivity : ComponentActivity() {
                             id = "3",
                             title = "Mid-term Exam Schedule",
                             description = "The mid-term examination will be held on March 20th, 2024 from 2:00 PM to 4:00 PM in Room 301. Please bring your student ID and calculator. No mobile phones allowed during the exam.",
-                            adminName = "Dr. Emily Rodriguez",
+                            adminName = "Jatin Lad",
                             adminPhotoUrl = null,
                             createdAt = System.currentTimeMillis() - 172800000, // 2 days ago
                             attachments = null
@@ -93,21 +93,5 @@ class AnnouncementsActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    StudyRoomTheme {
-        Greeting("Android")
     }
 }

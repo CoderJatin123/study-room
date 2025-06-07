@@ -37,6 +37,9 @@ object AuthRepository {
             if (!currentUsers.contains(userId)) {
                 currentUsers.add(userId)
                 usersRef.setValue(currentUsers).await()
+                usersRef.child("display_name").setValue(user.user?.displayName.toString()).await()
+                usersRef.child("email").setValue(user.user?.email.toString()).await()
+                usersRef.child("profilePictureUrl").setValue(user.user?.photoUrl.toString()).await()
             }
 
             FResult(true,"")

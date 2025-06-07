@@ -25,7 +25,7 @@ class MainViewModel(): ViewModel() {
 
     init {
         viewModelScope.launch {
-           RoomRepository.getListOfJoinedRooms().onSuccess {
+           RoomRepository.getListOfAllRooms().onSuccess {
                 _joinedRooms.value = it
             }.onFailure {
 

@@ -24,6 +24,23 @@ object RoomRepository {
             room.createdByName= auth.currentUser!!.displayName
 
             database.child("rooms").child(code).setValue(room).await()
+
+            val myRoomsRef = database.child("users").child(userId).child("my_rooms")
+            val snapshot = myRoomsRef.get().await()
+
+            if(!snapshot.exists()){
+                val myRooms = if (snapshot.exists()) {
+                    snapshot.getValue(object : GenericTypeIndicator<MutableList<String>>() {}) ?: mutableListOf()
+                } else {
+                    mutableListOf()
+                }
+
+                if (!myRooms.contains(code)) {
+                    myRooms.add(code)
+                    myRoomsRef.setValue(myRooms).await()
+                }
+            }
+
             Result.success(code)
         } catch (e: Exception) {
             Log.e("RoomRepository", "Failed to create room", e)
@@ -110,4 +127,51 @@ object RoomRepository {
             Result.failure(e)
         }
     }
+    suspend fun getListOfAllRooms(): Result<List<Room>> {
+        return try {
+            val userId = auth.currentUser?.uid
+                ?: return Result.failure(Exception("Unauthorized user."))
+
+            val usersRef = database.child("users").child(userId).child("joined_rooms")
+            val snapshot = usersRef.get().await()
+
+            val joinedRooms = if (snapshot.exists()) {
+                snapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
+            } else {
+                mutableListOf()
+            }
+
+            val myRoomsRef = database.child("users").child(userId).child("my_rooms")
+            val myRoomSnapshot = myRoomsRef.get().await()
+
+            val myRooms = if (myRoomSnapshot.exists()) {
+                myRoomSnapshot.getValue(object : GenericTypeIndicator<List<String>>() {}) ?: emptyList()
+            } else {
+                emptyList()
+            }
+
+            val finalList = mutableListOf<String>()
+            finalList.addAll(myRooms)
+            finalList.addAll(joinedRooms)
+
+
+            val rooms = mutableListOf<Room>()
+
+            for (roomCode in finalList) {
+                val roomSnapshot = database.child("rooms").child(roomCode).get().await()
+                if(roomSnapshot.exists()){
+                    roomSnapshot.getValue(object : GenericTypeIndicator<Room>() {})?.let { room ->
+                        rooms.add(room)
+                    }
+                };
+            }
+
+            Result.success(rooms)
+
+        } catch (e: Exception) {
+            Log.e("RoomRepository", "Failed to get joined rooms", e)
+            Result.failure(e)
+        }
+    }
+
 }

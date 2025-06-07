@@ -56,14 +56,14 @@ fun HomeScreen(viewModel : MainViewModel = MainViewModel()){
 //            Room(name = "Mathematic", createdBy = "Jainm")
 //        }
 //    }
+
     Box(
-        modifier = Modifier.fillMaxSize()
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-            .padding(bottom = 22.dp)
+        modifier = Modifier.fillMaxSize().padding(top = 4.dp)
+
     ){
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(10.dp),
-            contentPadding = PaddingValues(vertical = 8.dp)
+            contentPadding = PaddingValues(vertical = 8.dp, horizontal = 8.dp)
         ) {
             items(rooms) { room ->
                 RoomCard(room,
@@ -92,9 +92,8 @@ fun RoomCard(
         },
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 2.dp, vertical = 5.dp),
-        border = BorderStroke(1.2.dp, color = colorResource(R.color.green_dark)), // Green dark color
+            .fillMaxWidth(),
+        border = BorderStroke(1.2.dp, color = colorResource(R.color.stroke)), // Green dark color
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
         ),
