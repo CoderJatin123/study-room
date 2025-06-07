@@ -1,4 +1,4 @@
-package com.application.studyroom.room.create.domain.Utils
+package com.application.studyroom.room.create.domain.utils
 import kotlin.random.Random
 
 fun getNewRoomCode(): String {

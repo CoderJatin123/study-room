@@ -5,3 +5,5 @@ data class SignInResult(
     val errorMessage: String?
 )
 
+class FResult(val result: Boolean, val errorMessage: String)
+

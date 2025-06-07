@@ -10,9 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,38 +31,87 @@ import com.application.studyroom.ui.theme.MyButton
 @Composable
 fun BoardingScreen(modifier: Modifier = Modifier, navHostController: NavHostController) {
 
-    Column(modifier = modifier.fillMaxSize().padding(all = 12.dp).padding(bottom = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 18.dp, vertical = 16.dp)
+            .padding(bottom = 22.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
 
-        Column(modifier = Modifier.weight(weight = 1f).fillMaxWidth().
-        padding(top = 40.dp),
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .padding(top = 60.dp),
             verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally) {
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
 
-            Text(text = "Welcome to", color = colorResource(R.color.green_dark))
-            Text(text = "StudyRoom",
-                modifier = Modifier.padding(top = 8.dp),
-                color = colorResource(R.color.title),
-                fontSize = 36.sp, fontWeight = FontWeight.W700)
-
-            Image(
-                modifier = Modifier.fillMaxWidth().padding(top = 20.dp, start = 40.dp, end = 40.dp, bottom = 5.dp),
-                painter = painterResource(R.drawable.art_laptop_man),
-                contentDescription = ""
+            // Welcome text with lighter weight for better hierarchy
+            Text(
+                text = "Welcome to",
+                color = colorResource(R.color.green_dark),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Medium,
+                letterSpacing = 0.5.sp
             )
 
-            Text(text = stringResource(R.string.hero_text_boarding_screen),
+            // App name with strong emphasis
+            Text(
+                text = "StudyRoom",
+                modifier = Modifier.padding(top = 4.dp, bottom = 8.dp),
+                color = colorResource(R.color.title),
+                fontSize = 40.sp,
+                fontWeight = FontWeight.ExtraBold,
+                letterSpacing = (-0.5).sp,
+                lineHeight = 44.sp
+            )
+
+            // Hero image with better spacing
+            Image(
+                modifier = Modifier
+                    .fillMaxWidth(0.8f) // More controlled width
+                    .padding(vertical = 32.dp),
+                painter = painterResource(R.drawable.art_laptop_man),
+                contentDescription = "Person studying with laptop illustration",
+                contentScale = ContentScale.Fit
+            )
+
+            // Description text with better readability
+            Text(
+                text = stringResource(R.string.hero_text_boarding_screen),
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.W600,
-                modifier = Modifier.padding(16.dp))
+                fontWeight = FontWeight.Normal,
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                color = colorResource(R.color.gray), // Assuming you have this
+                modifier = Modifier.padding(horizontal = 8.dp),
+                letterSpacing = 0.1.sp
+            )
         }
 
-        MyButton(text = "Create an Account",true) {
-            navHostController.navigate(SignupScreen)
-        }
+        // Button section with better spacing
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
 
-        MyButton(text = "Login with Email", false) {
-            navHostController.navigate(LoginScreen)
+            // Primary action button
+            MyButton(
+                text = "Create Account", // Shorter, more direct
+                isPrimary = true
+            ) {
+                navHostController.navigate(SignupScreen)
+            }
+
+            // Secondary action button
+            MyButton(
+                text = "Sign In", // More common terminology
+                isPrimary = false
+            ) {
+                navHostController.navigate(LoginScreen)
+            }
         }
     }
 }

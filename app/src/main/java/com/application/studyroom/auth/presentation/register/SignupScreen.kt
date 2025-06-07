@@ -18,13 +18,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -43,10 +47,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,13 +73,13 @@ import kotlinx.coroutines.launch
 @Composable
 fun SignupScreen(
     modifier: Modifier = Modifier,
-    viewModel: SignupViewModel = SignupViewModel()
+    viewModel: SignupViewModel = SignupViewModel(),
+    activity: AuthActivity? = null
 ) {
-    val activity = (LocalActivity.current as AuthActivity)
 
     val googleAuthUiClient by lazy {
         GoogleAuth(
-            context = activity.applicationContext,
+            context = activity!!.applicationContext,
             oneTapClient = Identity.getSignInClient(activity.applicationContext)
         )
     }
@@ -95,77 +105,79 @@ fun SignupScreen(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
         onResult = { result ->
             if(result.resultCode == RESULT_OK) {
-                activity.lifecycleScope.launch {
+                activity!!.lifecycleScope.launch {
                     val signInResult = googleAuthUiClient.signInWithIntent(
                         intent = result.data ?: return@launch
                     )
                     if(signInResult.data!=null){
-                        activity.onAuthCompleted()
+                        activity!!.onAuthCompleted()
                     }
                 }
             }
         }
     )
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()
+    ) {
 
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(all = 12.dp)
-                .padding(bottom = 12.dp),
+                .padding(horizontal = 18.dp, vertical = 16.dp)
+                .padding(bottom = 22.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp, alignment = Alignment.CenterVertically)
         ) {
 
-            Image(
-                modifier = Modifier
-                    .width(100.dp)
-                    .padding(top = 20.dp, bottom = 25.dp)
-                    .align(Alignment.CenterHorizontally),
-                painter = painterResource(R.drawable.app_logo),
-                contentDescription = ""
-            )
-
             Text(
-                modifier = Modifier.padding(start = 2.dp),
-                text = "Start with new chapter",
-                color = colorResource(R.color.green_dark)
+                text = "Start your new chapter",
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = colorResource(R.color.green_dark),
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 0.5.sp
+                ),
+                modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
-                text = "Create an account",
-                modifier = Modifier.padding(top = 2.dp, bottom = 22.dp, start = 2.dp),
-                color = colorResource(R.color.title),
-                fontSize = 32.sp, fontWeight = FontWeight.W700
+                text = "Create Account",
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    color = colorResource(R.color.title),
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 36.sp,
+                    letterSpacing = (-0.5).sp
+                )
             )
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .padding(vertical = 12.dp).padding(top = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(6.dp))
                         .onFocusChanged { focusState ->
                             if (isEmailFocused && !focusState.isFocused) {
                                 viewModel.validateEmail()
                             }
                             isEmailFocused = focusState.isFocused
                         },
-                    label = {
-                        Text(text = "Email")
-                    },
                     value = email,
-                    onValueChange = {
-                        viewModel.setEmail(it.trim())
-                    },
-                    supportingText = null,
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                    onValueChange = { viewModel.setEmail(it.trim()) },
+                    label = { Text("Email Address") },
+                    placeholder = { Text("Enter your email") },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next
                     ),
+                    singleLine = true,
+                    isError = emailError != null,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(R.color.green_dark),
+                        errorBorderColor = MaterialTheme.colorScheme.error
+                    )
                 )
 
                 if (emailError != null) {
@@ -176,13 +188,11 @@ fun SignupScreen(
                         modifier = Modifier.padding(start = 4.dp),
                         fontSize = 14.sp
                     )
-
                 }
 
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(6.dp))
                         .onFocusChanged { focusState ->
                             if (isPasswordFocused && !focusState.isFocused) {
                                 viewModel.validatePassword()
@@ -196,11 +206,16 @@ fun SignupScreen(
                     } else {
                         PasswordVisualTransformation()
                     },
-                    onValueChange = { viewModel.setPassword(it.trim()) },
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
                     ),
+                    onValueChange = { viewModel.setPassword(it.trim()) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(R.color.green_dark),
+                        errorBorderColor = MaterialTheme.colorScheme.error
+                    ),
+                    shape = RoundedCornerShape(8.dp),
                     singleLine = true,
                     trailingIcon = {
                         IconButton(
@@ -228,10 +243,9 @@ fun SignupScreen(
                     )
                 }
 
-                TextField(
+                OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(6.dp))
                         .onFocusChanged { focusState ->
                             if (isCoPasswordFocused && !focusState.isFocused) {
                                 viewModel.validateConfirmPassword()
@@ -246,11 +260,16 @@ fun SignupScreen(
                         PasswordVisualTransformation()
                     },
                     onValueChange = { viewModel.setConfirmPassword(it.trim()) },
-                    colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(R.color.green_dark),
+                        errorBorderColor = MaterialTheme.colorScheme.error
+                    ),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Next
                     ),
                     singleLine = true,
+                    shape = RoundedCornerShape(8.dp),
                     trailingIcon = {
                         IconButton(
                             modifier = Modifier
@@ -284,10 +303,31 @@ fun SignupScreen(
                         viewModel.setTerms(it)
                     })
 
-                    Row {
-                        Text(text = "Yes, I agree with ")
-                        Text(text = "term & condition.", color = colorResource(R.color.green_dark))
-                    }
+                    Text(
+                        text = buildAnnotatedString {
+                            append("I agree to the ")
+                            withStyle(
+                                style = SpanStyle(
+                                    color = colorResource(R.color.green_dark),
+                                    fontWeight = FontWeight.Medium,
+                                    textDecoration = TextDecoration.Underline
+                                )
+                            ) {
+                                append("Terms & Conditions")
+                            }
+                            append(" and ")
+                            withStyle(
+                                style = SpanStyle(
+                                    color = colorResource(R.color.green_dark),
+                                    fontWeight = FontWeight.Medium,
+                                    textDecoration = TextDecoration.Underline
+                                )
+                            ) {
+                                append("Privacy Policy")
+                            }
+                        },
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
 
             }
@@ -301,7 +341,7 @@ fun SignupScreen(
                 )
             }
 
-            MyButton(text = "Signup", true) {
+            MyButton(text = "Create Account", true) {
 
                 isPasswordFocused = true
                 isEmailFocused = true
@@ -311,18 +351,31 @@ fun SignupScreen(
 
                 viewModel.signup { isSuccess->
                         if(isSuccess){
-                            activity.onAuthCompleted()
+                            activity!!.onAuthCompleted()
                         }
                 }
 
             }
 
-            Text("OR", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Divider(modifier = Modifier.weight(1f))
+                Text(
+                    text = "OR",
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colorResource(R.color.gray)
+                )
+                Divider(modifier = Modifier.weight(1f))
+            }
+
             OutlinedButton(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(15),
+                shape = RoundedCornerShape(8.dp),
                 onClick = {
-                    activity.lifecycleScope.launch {
+                    activity!!.lifecycleScope.launch {
                         val signInIntentSender = googleAuthUiClient.signIn()
                         launcher.launch(
                             IntentSenderRequest.Builder(
@@ -336,23 +389,39 @@ fun SignupScreen(
                     contentColor = colorResource(R.color.gray),
                 ), border = BorderStroke(1.dp, colorResource(R.color.gray))
             ) {
-                ButtonText("Signing with ")
                 Image(
-                    modifier = Modifier.padding(start = 2.dp),
+                    modifier = Modifier.padding(end = 8.dp),
                     painter = painterResource(R.drawable.icon_google),
                     contentDescription = "Google Icon"
                 )
-            }
-            TextButton(
-                onClick = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally),
-            ) {
-                Text("Already have an account ? ")
-                Text("Login here", color = colorResource(R.color.blue))
+                ButtonText("Continue with Google ")
+
             }
 
+            Box(modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center){
+                TextButton(
+                    onClick = { /* Navigate to login */ },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                ) {
+                    Text(
+                        text = buildAnnotatedString {
+                            append("Already have an account? ")
+                            withStyle(
+                                style = SpanStyle(
+                                    color = colorResource(R.color.green_dark),
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            ) {
+                                append("Sign In")
+                            }
+                        },
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
         }
 
         if (isLoading) {

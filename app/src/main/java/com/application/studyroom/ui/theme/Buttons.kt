@@ -23,9 +23,9 @@ fun MyButton(text: String, isPrimary: Boolean, onClick: () -> Unit) {
     if (isPrimary) {
         Button(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(15), onClick = onClick,
+            shape = RoundedCornerShape(8.dp), onClick = onClick,
             colors = ButtonDefaults.buttonColors(
-                containerColor = colorResource(R.color.blue),
+                containerColor = colorResource(R.color.green_dark),
                 contentColor = Color.White,
             )
         ) {
@@ -52,6 +52,6 @@ fun ButtonText(text: String) {
         text = text,
         fontSize = 16.sp,
         fontWeight = FontWeight.W600,
-        modifier = Modifier.padding(top = 7.dp, bottom = 7.dp)
+        modifier = Modifier.padding(top = 9.dp, bottom = 9.dp)
     )
 }

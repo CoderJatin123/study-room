@@ -3,6 +3,7 @@ package com.application.studyroom.auth.domain
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
+import android.util.Log
 import com.application.studyroom.R
 import com.application.studyroom.auth.model.SignInResult
 import com.application.studyroom.auth.model.UserData
@@ -10,6 +11,9 @@ import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.GenericTypeIndicator
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.cancellation.CancellationException
@@ -20,7 +24,7 @@ class GoogleAuth(
     private val oneTapClient: SignInClient
 ) {
     private val auth = Firebase.auth
-
+    private val database: DatabaseReference = Firebase.database.reference
     suspend fun signIn(): IntentSender? {
         val result = try {
             oneTapClient.beginSignIn(
@@ -40,6 +44,17 @@ class GoogleAuth(
         val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
         return try {
             val user = auth.signInWithCredential(googleCredentials).await().user
+            val userId= user?.uid  ?: ""
+
+            val usersRef = database.child("users").child(userId)
+            val snapshot = usersRef.get().await()
+
+            if(!snapshot.exists()){
+                usersRef.child("display_name").setValue(user?.displayName.toString()).await()
+                usersRef.child("email").setValue(user?.email.toString()).await()
+                usersRef.child("profilePictureUrl").setValue(user?.photoUrl.toString()).await()
+            }
+
             SignInResult(
                 data = user?.run {
                     UserData(
@@ -52,7 +67,6 @@ class GoogleAuth(
                 errorMessage = null
             )
         } catch(e: Exception) {
-            e.printStackTrace()
             if(e is CancellationException) throw e
             SignInResult(
                 data = null,

@@ -107,12 +107,14 @@ class SignupViewModel: ViewModel() {
 
             viewModelScope.launch {
                 val result = AuthRepository.createUser(email.value, password.value)
-                if(result.isSuccess){
+                if(result.result){
                 _isLoading.update { false }
                    onResult(true)
                 }else{
                 _isLoading.update { false }
                   onResult(false)
+                        emailError.update { result.errorMessage }
+                        _isValidEmail.update { false }
                 }
             }
         }
@@ -124,7 +126,6 @@ class SignupViewModel: ViewModel() {
     }
 
     fun setEmail(string: String) {
-        Log.d("TAG", "setEmail: "+string)
         _email.update { string }
     }
 

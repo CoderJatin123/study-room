@@ -3,8 +3,10 @@
     <string name="title_activity_auth">AuthActivity</string>
     <string name="default_web_client_id">988490473841-tec1psq7bd8q2phtlnif92e2mspct0gl.apps.googleusercontent.com</string>
     <string name="hero_text_boarding_screen">
-        StudyRoom lets you join rooms, get real-time notifications, and access all your study materials in one place—making learning organized, connected, and easy.
+        Welcome to StudyRoom - your digital learning hub. Join or create study rooms to organize your classes, stay informed with real-time announcements, and never miss important course materials. Start building your learning community today.
     </string>
     <string name="title_activity_create_room">CreateRoomActivity</string>
+    <string name="title_activity_join_room">JoinRoomActivity</string>
+    <string name="title_activity_announcements">AnnouncementsActivity</string>
 
 </resources>

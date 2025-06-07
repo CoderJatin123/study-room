@@ -2,7 +2,6 @@ package com.application.studyroom.main.components
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -27,20 +25,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavOptions
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.application.studyroom.R
+import com.application.studyroom.auth.components.AuthActivity
+import com.application.studyroom.auth.domain.AuthRepository
 import com.application.studyroom.main.presentation.announcements.AnnouncementsScreen
 import com.application.studyroom.main.presentation.components.CurrentScreen
 import com.application.studyroom.main.presentation.components.DetailedDrawer
 import com.application.studyroom.main.presentation.components.FabWithDropdown
 import com.application.studyroom.main.presentation.components.navigateToScreen
 import com.application.studyroom.main.presentation.home.HomeScreen
-import com.application.studyroom.room.create.components.CreateRoomActivity
+import com.application.studyroom.room.create.presentation.CreateRoomActivity
+import com.application.studyroom.room.join.presentation.JoinRoomActivity
 import com.application.studyroom.ui.StudyRoomTheme
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -70,16 +71,26 @@ fun MainScreen(viewModel: MainViewModel = MainViewModel(), activity: MainActivit
         DetailedDrawer(drawerState, currentScreen, onSelect = {
           navigateToScreen(it,navHostController)
 
+        }, onLogout = {
+            activity!!.lifecycleScope.launch {
+                AuthRepository.signOut()
+            }
+            val intent = Intent(activity, AuthActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK and Intent.FLAG_ACTIVITY_CLEAR_TASK
+            activity.startActivity(intent)
+            activity.finish()
         }) {
             Scaffold(
                 floatingActionButton = {
                     if(currentScreen==CurrentScreen.HOME){
                         FabWithDropdown(onCreateRoom = {
                             activity?.startActivity(
-                                Intent(activity.baseContext,CreateRoomActivity::class.java)
+                                Intent(activity.baseContext, CreateRoomActivity::class.java)
                             )
                         }, onJoinRoom = {
-
+                            activity?.startActivity(
+                                Intent(activity.baseContext, JoinRoomActivity::class.java)
+                            )
                         })
                     }else{
 
@@ -89,7 +100,7 @@ fun MainScreen(viewModel: MainViewModel = MainViewModel(), activity: MainActivit
                 topBar = {
                     TopAppBar(
                         title = {
-                            Text(text = "Study Room")
+                            Text(text = "Study Room", fontSize = 24.sp)
                         },
                         navigationIcon = {
                             IconButton(onClick = {
@@ -105,7 +116,7 @@ fun MainScreen(viewModel: MainViewModel = MainViewModel(), activity: MainActivit
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
-                            containerColor = colorResource(R.color.blue),
+                            containerColor = colorResource(R.color.green_dark),
                             titleContentColor = Color.White
                         )
                     )
@@ -127,7 +138,7 @@ fun MainScreen(viewModel: MainViewModel = MainViewModel(), activity: MainActivit
                         }
                         composable<AnnouncementsScreen> {
                             viewModel.setCurrentState(CurrentScreen.ANNOUNCEMENTS)
-                          AnnouncementsScreen()
+                          //AnnouncementsScreen()
                         }
                       }
                 }

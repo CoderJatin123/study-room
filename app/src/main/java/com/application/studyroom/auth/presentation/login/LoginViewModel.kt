@@ -87,12 +87,12 @@ class LoginViewModel(): ViewModel() {
             _isLoading.update { true }
             viewModelScope.launch {
                 val result = AuthRepository.loginUser(email.value, password.value)
-                if(result.isSuccess){
+                if(result.result){
                     _isLoading.update { false }
                     onResult(true)
                 }else{
                     _isLoading.update { false }
-                    passwordError.update { "Incorrect email or password" }
+                    passwordError.update { result.errorMessage }
                     onResult(false)
                 }
             }

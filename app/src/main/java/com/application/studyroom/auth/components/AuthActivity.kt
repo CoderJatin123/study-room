@@ -22,6 +22,8 @@ import com.application.studyroom.auth.presentation.boarding.BoardingScreen
 import com.application.studyroom.auth.presentation.login.LoginViewModel
 import com.application.studyroom.auth.presentation.register.SignupViewModel
 import com.application.studyroom.ui.StudyRoomTheme
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.initialize
 import kotlinx.serialization.Serializable
 
 class AuthActivity : ComponentActivity() {
@@ -29,6 +31,7 @@ class AuthActivity : ComponentActivity() {
         super.onStart()
 
         if(AuthRepository.currentUser!=null){
+            Firebase.initialize(this)
             onAuthCompleted()
         }
     }
@@ -57,14 +60,14 @@ class AuthActivity : ComponentActivity() {
                             SignupScreen(
                                 modifier = Modifier
                                     .padding(innerPadding)
-                                    .fillMaxSize(), signupViewModel)
+                                    .fillMaxSize(), signupViewModel,this@AuthActivity)
                         }
                         composable<LoginScreen> {
                             val loginViewModel = ViewModelProvider(LocalActivity.current as AuthActivity)[LoginViewModel::class.java]
                             LoginScreen(
                                 modifier = Modifier
                                     .padding(innerPadding)
-                                    .fillMaxSize(),loginViewModel)
+                                    .fillMaxSize(),loginViewModel,this@AuthActivity)
                         }
                     }
                 }
@@ -76,6 +79,7 @@ class AuthActivity : ComponentActivity() {
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
+        finish()
     }
 }
 
