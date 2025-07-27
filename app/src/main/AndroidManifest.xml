@@ -12,40 +12,15 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.StudyRoom"
+        android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".main.components.AnnouncementsActivity"
-            android:exported="false"
-            android:label="@string/title_activity_announcements"
-            android:theme="@style/Theme.StudyRoom" />
-        <activity
-            android:name=".room.join.presentation.JoinRoomActivity"
-            android:exported="false"
-            android:label="@string/title_activity_join_room"
-            android:theme="@style/Theme.StudyRoom" />
-        <activity
-            android:name=".room.create.presentation.CreateRoomActivity"
-            android:exported="false"
-            android:label="@string/title_activity_create_room"
-            android:theme="@style/Theme.StudyRoom" />
-        <activity
-            android:name=".room.create.componenets.CreateRoomActivity"
-            android:exported="false"
-            android:label="@string/title_activity_create_room"
-            android:theme="@style/Theme.StudyRoom" />
-        <activity
-            android:name=".main.components.MainActivity"
-            android:label="Home" />
-        <activity
-            android:name=".auth.components.AuthActivity"
+            android:name=".ui.activity.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.StudyRoom">
+            android:label="@string/title_activity_main">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
