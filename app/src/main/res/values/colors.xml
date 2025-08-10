@@ -1,5 +1,5 @@
 <resources>
-    <color name="md_theme_primary">#006878</color>
+    <color name="md_theme_primary">#00a073</color>
     <color name="md_theme_onPrimary">#FFFFFF</color>
     <color name="md_theme_primaryContainer">#A7EDFF</color>
     <color name="md_theme_onPrimaryContainer">#004E5B</color>
@@ -140,4 +140,34 @@
     <color name="md_theme_surfaceContainer_highContrast">#DEE3E5</color>
     <color name="md_theme_surfaceContainerHigh_highContrast">#D0D5D7</color>
     <color name="md_theme_surfaceContainerHighest_highContrast">#C2C7C9</color>
+
+    <!-- Brand Colors -->
+    <color name="primary_color">#00a073</color>
+    <color name="primary_dark">#4F46E5</color>
+    <color name="primary_light">#8B5CF6</color>
+
+    <!-- Background Colors -->
+    <color name="background_color">#FAFAFA</color>
+    <color name="surface_color">#FFFFFF</color>
+    <color name="input_background">#EAEBED</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#1F2937</color>
+    <color name="text_secondary">#6B7280</color>
+    <color name="text_hint">#9CA3AF</color>
+
+    <!-- Utility Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="white_30">#4DFFFFFF</color>
+    <color name="divider_color">#E5E7EB</color>
+    <color name="gray_light_30">#4DF3F4F6</color>
+
+    <!-- Button Colors -->
+    <color name="button_primary">#6366F1</color>
+    <color name="button_primary_pressed">#4F46E5</color>
+
+    <!-- Logo Colors -->
+    <color name="logo_primary">#6366F1</color>
+    <color name="logo_secondary">#10B981</color>
+    <color name="logo_background">#F0FDF4</color>
 </resources>

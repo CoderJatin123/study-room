@@ -19,5 +19,29 @@
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="lorem_ipsum">
+
+    </string>
+    <string name="continue_with_chapter">Continue with chapter</string>
+    <string name="login_to_your_account">Login to your account</string>
+    <string name="login">Login</string>
+    <string name="email">Email Address</string>
+    <string name="password">Password</string>
+    <string name="app_logo">App Logo</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="or">OR</string>
+    <string name="dont_have_account">Dont\' have an account ?</string>
+    <string name="signup"> Signup</string>
+    <string name="sign_in">Sign In</string>
+    <string name="welcome_back">Welcome back</string>
+    <string name="sigin_in">Sigin In</string>
+    <string name="already_have_an_account">Already have an account ?</string>
+    <string name="confirm_password">Confirm Password</string>
 
 </resources>
