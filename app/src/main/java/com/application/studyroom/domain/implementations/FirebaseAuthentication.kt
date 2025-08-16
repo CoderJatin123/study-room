@@ -1,13 +1,11 @@
 package com.application.studyroom.domain.implementations
 
 import android.content.Context
-import androidx.credentials.GetCredentialRequest
-import com.application.studyroom.R
 import com.application.studyroom.data.model.AuthResult
 import com.application.studyroom.data.model.UserCredential
+import com.application.studyroom.domain.googe_auth.GoogleAuth
 import com.application.studyroom.domain.repository.AuthRepository
-import com.application.studyroom.utils.Constants
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -15,9 +13,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class FirebaseAuthentication : AuthRepository {
+class FirebaseAuthentication() : AuthRepository {
 
     private var auth: FirebaseAuth = Firebase.auth
+    private var googleAuth: GoogleAuth? = null
+
     override suspend fun login(credential: UserCredential): AuthResult {
         return try {
             val result = withContext(Dispatchers.IO) {
@@ -40,15 +40,17 @@ class FirebaseAuthentication : AuthRepository {
         }
     }
 
+    override fun getGoogleAuthClient(context: Context): GoogleAuth {
+        if (googleAuth == null)
+            googleAuth = GoogleAuth(Identity.getSignInClient(context))
+        return googleAuth!!
+    }
 
-    override suspend fun isUserAvailable() = auth.currentUser
-    override fun logout() = auth.signOut()
-
-    override fun signInWithGoogle() {
-        val googleIdOption = GetGoogleIdOption.Builder()
-            .setServerClientId(Constants.WEB_CLIENT_ID)
-            .setFilterByAuthorizedAccounts(true).build()
-
-        val request = GetCredentialRequest.Builder().addCredentialOption(googleIdOption).build()
+    override fun isUserAvailable() = auth.currentUser
+    override suspend fun logout(){
+        googleAuth?.apply {
+            signOut()
+        }
+        auth.signOut()
     }
 }

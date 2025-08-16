@@ -5,6 +5,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -17,6 +18,7 @@ import com.application.studyroom.utils.startNewActivity
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -30,16 +32,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
+        if (authRepository.isUserAvailable() == null) {
+            startNewActivity(AuthActivity::class.java)
+            finish()
+        }
+
         setContentView(binding.root)
 
-//        setSupportActionBar(binding.appBarMain.toolbar)
+        //setSupportActionBar(binding.appBarMain.toolbar)
 
         binding.appBarMain.fab.setOnClickListener { view ->
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null)
-                .setAnchorView(R.id.fab).show()
+                .setAction("Action", null).setAnchorView(R.id.fab).show()
         }
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -77,8 +82,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onLogout() {
-        authRepository.logout()
-        startNewActivity(AuthActivity::class.java)
-        finish()
+        lifecycleScope.launch {
+            authRepository.logout()
+            startNewActivity(AuthActivity::class.java)
+            finish()
+        }
     }
 }

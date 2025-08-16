@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(private val authRepository: AuthRepository) : ViewModel() {
+class AuthViewModel @Inject constructor(val authRepository: AuthRepository) : ViewModel() {
     private val _loginUiState = MutableStateFlow<UiState<FirebaseUser>>(UiState.Initial)
     val loginUiState: StateFlow<UiState<FirebaseUser>> = _loginUiState.asStateFlow()
 
@@ -24,28 +24,34 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
 
     fun login(credential: UserCredential) {
         viewModelScope.launch {
-            _loginUiState.emit(UiState.Loading)
+           setState(UiState.Loading)
             when(val result = authRepository.login(credential)){
                 is AuthResult.Failed -> {
-                    _loginUiState.emit(UiState.Error(result.error))
+                    setState(UiState.Error(result.error))
                 }
                 is AuthResult.Success->{
-                    _loginUiState.emit(UiState.Success(result.user))
+                  setState(UiState.Success(result.user))
                 }
             }
         }
     }
     fun signup(credential: UserCredential) {
         viewModelScope.launch {
-            _loginUiState.emit(UiState.Loading)
+            setState(UiState.Loading)
             when(val result = authRepository.signup(credential)){
                 is AuthResult.Failed -> {
-                    _loginUiState.emit(UiState.Error(result.error))
+                    setState(UiState.Error(result.error))
                 }
                 is AuthResult.Success->{
-                    _loginUiState.emit(UiState.Success(result.user))
+                    setState(UiState.Success(result.user))
                 }
             }
+        }
+    }
+    fun isUserLoggedIn(): Boolean = authRepository.isUserAvailable() != null
+    fun setState(uiState: UiState<FirebaseUser>){
+        viewModelScope.launch {
+            _loginUiState.emit(uiState)
         }
     }
 }

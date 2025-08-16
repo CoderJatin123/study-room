@@ -41,10 +41,12 @@ class SignupFragment : Fragment() {
 
         setupInputValidators()
         attachClickListeners()
-        subscribeObservers()
+        subscribeObservers(view)
     }
 
     private fun attachClickListeners() {
+        binding.btnGoogleAuth.setOnClickListener { (requireActivity() as AuthActivity).onGoogleAuth() }
+
         binding.btnSignup.setOnClickListener {
             validateAllFields()?.let {
                 viewModel.signup(it)
@@ -80,7 +82,7 @@ class SignupFragment : Fragment() {
         } else null
     }
 
-    private fun subscribeObservers() {
+    private fun subscribeObservers(view: View) {
         lifecycleScope.launch {
             viewModel.signupUiState.collectLatest {
                 if (it !is UiState.Initial)
@@ -88,7 +90,7 @@ class SignupFragment : Fragment() {
                 when (it) {
                     is UiState.Error -> {
                         enableAllFields(true)
-                        showSnakeBar(binding.root, it.error)
+                        showSnakeBar(view, it.error)
                     }
 
                     UiState.Initial -> {

@@ -1,7 +1,6 @@
 package com.application.studyroom.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,10 +49,11 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupInputValidators()
         attachClickListeners()
-        subscribeObservers()
+        subscribeObservers(view)
     }
 
     private fun attachClickListeners() {
+        binding.btnGoogleAuth.setOnClickListener { (requireActivity() as AuthActivity).onGoogleAuth() }
         binding.btnSignIn.setOnClickListener {
             if (InputValidator.validateEmail(binding.tilEmail) && InputValidator.validatePassword(
                     binding.tilPassword
@@ -73,7 +73,7 @@ class LoginFragment : Fragment() {
         }
     }
 
-    private fun subscribeObservers() {
+    private fun subscribeObservers(view: View) {
         lifecycleScope.launch {
             viewModel.loginUiState.collectLatest {
                 if (it !is UiState.Initial)
@@ -81,7 +81,7 @@ class LoginFragment : Fragment() {
                 when (it) {
                     is UiState.Error -> {
                         enableAllFields(true)
-                        showSnakeBar(binding.root, it.error)
+                        showSnakeBar(view, it.error)
                     }
 
                     UiState.Initial -> {
