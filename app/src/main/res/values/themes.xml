@@ -103,6 +103,7 @@
     <dimen name="customRadios">8dp</dimen>
     <dimen name="btnPadding">14dp</dimen>
     <dimen name="fieldTextSize">13dp</dimen>
+
     <style name="primaryBtn" parent="ShapeAppearanceOverlay.Material3.Button">
         <item name="backgroundColor">@color/primary_color</item>
         <item name="cornerRadius">@dimen/customRadios</item>
@@ -125,10 +126,13 @@
     </style>
 
     <style name="textTitle" parent="Widget.MaterialComponents.TextView">
-        <item name="fontFamily">@font/poppins_medium</item>
+        <item name="fontFamily">@font/poppins_semibold</item>
         <item name="android:textSize">32sp</item>
     </style>
-    <style name="inputText" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+
+    <style name="inputTextLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="singleLine">true</item>
+        <item name="maxLines">1</item>
         <item name="boxCornerRadiusBottomEnd">@dimen/customRadios</item>
         <item name="boxCornerRadiusBottomStart">@dimen/customRadios</item>
         <item name="boxCornerRadiusTopEnd">@dimen/customRadios</item>

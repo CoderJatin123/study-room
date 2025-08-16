@@ -34,7 +34,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilEmail"
-        style="@style/inputText"
+        style="@style/inputTextLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="18dp"
@@ -44,6 +44,7 @@
             android:id="@+id/edtEmail"
             style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
             android:layout_width="match_parent"
+            android:inputType="textEmailAddress"
             android:layout_height="match_parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -52,37 +53,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        style="@style/inputText"
+        style="@style/inputTextLayout"
+        app:counterEnabled="true"
         android:hint="@string/password">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtPassword"
             style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:inputType="textPassword"/>
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
-        style="@style/inputText"
+        style="@style/inputTextLayout"
         android:id="@+id/tilCoPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        app:counterEnabled="true"
         android:hint="@string/confirm_password">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtCoPassword"
             style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
             android:layout_width="match_parent"
+            android:inputType="textPassword"
             android:layout_height="match_parent" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnSignup"
         style="@style/primaryBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Create Account" />
+        android:text="@string/create_account" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -108,7 +113,7 @@
     </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn"
+        android:id="@+id/btnGoogleAuth"
         style="@style/secondaryBtn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -120,6 +125,7 @@
         app:iconTintMode="add" />
 
     <LinearLayout
+        android:id="@+id/btnLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

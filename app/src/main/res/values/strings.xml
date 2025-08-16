@@ -43,5 +43,7 @@
     <string name="sigin_in">Sigin In</string>
     <string name="already_have_an_account">Already have an account ?</string>
     <string name="confirm_password">Confirm Password</string>
+    <string name="create_account">Create Account</string>
+    <string name="logout">Logout</string>
 
 </resources>

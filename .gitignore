@@ -15,4 +15,5 @@
 local.properties
 .idea/
 app/google-services.json
+app/src/main/java/com/application/studyroom/utils/Constants.kt
 
