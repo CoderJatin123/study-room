@@ -75,8 +75,83 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
         return state
     }
 
-    override suspend fun joinRoom(): Flow<UiState<Room>> {
-        val state = MutableSharedFlow<UiState<Room>>()
-        return state
+    override suspend fun joinRoom(roomCode: String, state: MutableSharedFlow<UiState<Room>>) {
+        state.emit(UiState.Loading)
+        try {
+            // Check if user is authenticated
+            val currentUser = auth.currentUser
+            if (currentUser == null) {
+                state.emit(UiState.Error("User not authenticated"))
+                return
+            }
+
+            val userId = currentUser.uid
+
+            // Check if the room exists
+            val roomRef = database.child("rooms").child(roomCode)
+            val roomSnapshot = roomRef.get().await()
+
+            if (!roomSnapshot.exists()) {
+                Log.d("RoomRepository", "joinRoom: Room not found")
+                state.emit(UiState.Error("Room not found"))
+                return
+            }
+
+            // Get the room data
+            val room = roomSnapshot.getValue(object : GenericTypeIndicator<Room>() {})
+            if (room == null) {
+                state.emit(UiState.Error("Failed to parse room data"))
+                return
+            }
+
+            // Check if user is already a participant
+            val participantsRef = roomRef.child("participants")
+            val participantsSnapshot = participantsRef.get().await()
+
+            val currentParticipants = if (participantsSnapshot.exists()) {
+                participantsSnapshot.getValue(object : GenericTypeIndicator<List<String>>() {})
+                    ?: emptyList()
+            } else {
+                emptyList()
+            }
+
+            if (currentParticipants.contains(userId)) {
+                // User is already a participant, just return the room
+                state.emit(UiState.Error("You have already joined this room"))
+                return
+            }
+
+            // Add user to room's participants list
+            val updatedParticipants = currentParticipants.toMutableList().apply {
+                add(userId)
+            }
+            participantsRef.setValue(updatedParticipants).await()
+
+            // Add room code to user's joined_rooms list
+            val userJoinedRoomsRef = database.child("users").child(userId).child("joined_rooms")
+            val userRoomsSnapshot = userJoinedRoomsRef.get().await()
+
+            val currentJoinedRooms = if (userRoomsSnapshot.exists()) {
+                userRoomsSnapshot.getValue(object : GenericTypeIndicator<List<String>>() {})
+                    ?: emptyList()
+            } else {
+                emptyList()
+            }
+
+            // Only add if not already in the list (double-check for consistency)
+            if (!currentJoinedRooms.contains(roomCode)) {
+                val updatedJoinedRooms = currentJoinedRooms.toMutableList().apply {
+                    add(roomCode)
+                }
+                userJoinedRoomsRef.setValue(updatedJoinedRooms).await()
+            }
+
+            state.emit(UiState.Success(room))
+
+        } catch (e: Exception) {
+            Log.e("RoomRepository", "Failed to join room: $roomCode", e)
+            state.emit(UiState.Error("Failed to join room: ${e.localizedMessage ?: "Unknown error"}"))
+        }
+        return
     }
 }

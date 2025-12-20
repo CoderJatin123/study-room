@@ -1,11 +1,30 @@
 package com.application.studyroom.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.application.studyroom.data.model.Room
 import com.application.studyroom.domain.repository.RoomRepository
+import com.application.studyroom.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class RoomsViewModel @Inject constructor(private val roomRepository: RoomRepository) : ViewModel() {
 
+    private val _joinRoomState = MutableStateFlow<UiState<Room>>(UiState.Initial)
+    val joinRoomState: StateFlow<UiState<Room>> = _joinRoomState.asStateFlow()
+
+    fun joinRoom(roomCode: String) {
+        viewModelScope.launch {
+            roomRepository.joinRoom(roomCode, _joinRoomState)
+        }
+    }
+
+    fun resetJoinRoomState() {
+        _joinRoomState.value = UiState.Initial
+    }
 }
