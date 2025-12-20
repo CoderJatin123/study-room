@@ -1,4 +1,4 @@
-package com.application.studyroom.ui.fragment
+package com.application.studyroom.ui.fragment.auth
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -41,7 +41,7 @@ class SignupFragment : Fragment() {
 
         setupInputValidators()
         attachClickListeners()
-        subscribeObservers(view)
+        subscribeObservers(binding.root)
     }
 
     private fun attachClickListeners() {

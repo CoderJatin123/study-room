@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/LoginFragment"
-        android:name="com.application.studyroom.ui.fragment.LoginFragment"
+        android:name="com.application.studyroom.ui.fragment.auth.LoginFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_login">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/SignupFragment"
-        android:name="com.application.studyroom.ui.fragment.SignupFragment"
+        android:name="com.application.studyroom.ui.fragment.auth.SignupFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_signup">
 

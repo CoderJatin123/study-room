@@ -3,7 +3,9 @@ package com.application.studyroom.ui.activity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.PopupMenu
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -13,8 +15,10 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.application.studyroom.R
 import com.application.studyroom.databinding.ActivityMainBinding
+import com.application.studyroom.databinding.NavHeaderMainBinding
 import com.application.studyroom.domain.repository.AuthRepository
 import com.application.studyroom.utils.startNewActivity
+import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,9 +47,31 @@ class MainActivity : AppCompatActivity() {
         //setSupportActionBar(binding.appBarMain.toolbar)
 
         binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).setAnchorView(R.id.fab).show()
+            val popMenu = PopupMenu(this@MainActivity, view)
+
+            popMenu.apply {
+                menu.add(0, 1, 0, "Create Room")
+                menu.add(0, 2, 1, getString(R.string.join_room))
+                setOnMenuItemClickListener { item ->
+                    when (item.itemId) {
+                        1 -> {
+//                            startActivity<Creat>
+                            true
+                        }
+
+                        2 -> {
+                            startNewActivity(JoinRoomActivity::class.java)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+
+                show()
+            }
+
         }
+
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)
@@ -53,11 +79,12 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
+                R.id.nav_rooms, R.id.nav_announcements, R.id.nav_settings
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+        setUpDrawerViews(navView.getHeaderView(0))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -86,6 +113,15 @@ class MainActivity : AppCompatActivity() {
             authRepository.logout()
             startNewActivity(AuthActivity::class.java)
             finish()
+        }
+    }
+
+    private fun setUpDrawerViews(headerView: View) {
+        val headerBinding = NavHeaderMainBinding.bind(headerView)
+        authRepository.isUserAvailable()?.let {
+            Glide.with(this).load(it.photoUrl).into(headerBinding.imageView)
+            headerBinding.tvTitle.text = it.displayName ?: "-"
+            headerBinding.tvSubTitle.text = it.email ?: "-"
         }
     }
 }

@@ -51,6 +51,7 @@ class AuthViewModel @Inject constructor(val authRepository: AuthRepository) : Vi
     fun isUserLoggedIn(): Boolean = authRepository.isUserAvailable() != null
     fun setState(uiState: UiState<FirebaseUser>){
         viewModelScope.launch {
+            _loginUiState.emit(UiState.Initial)
             _loginUiState.emit(uiState)
         }
     }

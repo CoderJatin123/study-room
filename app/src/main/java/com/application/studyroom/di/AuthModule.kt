@@ -3,6 +3,7 @@ package com.application.studyroom.di
 import android.content.Context
 import com.application.studyroom.domain.implementations.FirebaseAuthentication
 import com.application.studyroom.domain.repository.AuthRepository
+import com.application.studyroom.network.NetworkHelper
 import com.application.studyroom.ui.viewmodel.AuthViewModel
 import dagger.Module
 import dagger.Provides
@@ -18,7 +19,7 @@ class AuthModule {
 
     @Singleton
     @Provides
-    fun providesAuthRepository(): AuthRepository  = FirebaseAuthentication()
+    fun providesAuthRepository(networkHelper: NetworkHelper): AuthRepository  = FirebaseAuthentication(networkHelper)
 
     @Singleton
     @Provides

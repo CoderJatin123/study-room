@@ -151,6 +151,8 @@
     <color name="surface_color">#FFFFFF</color>
     <color name="input_background">#EAEBED</color>
 
+    <color name="shimmer_bg">#E4E4E4</color>
+
     <!-- Text Colors -->
     <color name="text_primary">#1F2937</color>
     <color name="text_secondary">#6B7280</color>
