@@ -1,9 +1,13 @@
 package com.application.studyroom.ui.activity
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.drawerlayout.widget.DrawerLayout
@@ -13,24 +17,25 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.application.studyroom.BaseActivity
 import com.application.studyroom.R
 import com.application.studyroom.databinding.ActivityMainBinding
 import com.application.studyroom.databinding.NavHeaderMainBinding
 import com.application.studyroom.domain.repository.AuthRepository
+import com.application.studyroom.ui.viewmodel.HomeViewModel
 import com.application.studyroom.utils.startNewActivity
 import com.bumptech.glide.Glide
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-
+    private val homeViewModel : HomeViewModel by viewModels()
     @Inject
     lateinit var authRepository: AuthRepository
 
@@ -60,9 +65,10 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         2 -> {
-                            startNewActivity(JoinRoomActivity::class.java)
+                            joinRoomContract.launch(Intent(this@MainActivity, JoinRoomActivity::class.java))
                             true
                         }
+
                         else -> false
                     }
                 }
@@ -124,4 +130,11 @@ class MainActivity : AppCompatActivity() {
             headerBinding.tvSubTitle.text = it.email ?: "-"
         }
     }
+
+    private val joinRoomContract =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == RESULT_OK) {
+                homeViewModel.refresh()
+            }
+        }
 }

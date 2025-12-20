@@ -13,6 +13,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -40,8 +41,7 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
         return state
     }
 
-    override suspend fun getRooms(): Flow<UiState<List<Room>>> {
-        val state = MutableSharedFlow<UiState<List<Room>>>()
+    override suspend fun getRooms(state: MutableStateFlow<UiState<List<Room>>>) {
         state.emit(UiState.Loading)
         try {
             auth.currentUser?.let {
@@ -72,7 +72,7 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
             Log.e("RoomRepository", "Failed to get joined rooms", e)
             state.emit(UiState.Error("Failed to get joined rooms"))
         }
-        return state
+        return
     }
 
     override suspend fun joinRoom(roomCode: String, state: MutableSharedFlow<UiState<Room>>) {

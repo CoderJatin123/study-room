@@ -4,15 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.application.studyroom.data.model.Room
 import com.application.studyroom.databinding.FragmentRoomsBinding
 import com.application.studyroom.domain.repository.RoomRepository
+import com.application.studyroom.ui.adapter.RoomCardAdapter
+import com.application.studyroom.ui.state.UiState
 import com.application.studyroom.ui.viewmodel.HomeViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,33 +26,49 @@ class RoomsFragment : Fragment() {
     @Inject
     lateinit var roomRepository: RoomRepository
 
-    private var _binding: FragmentRoomsBinding? = null
+    lateinit var roomsAdapter: RoomCardAdapter
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private val homeViewModel : HomeViewModel by activityViewModels()
 
+    private lateinit var binding: FragmentRoomsBinding
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
-
-        _binding = FragmentRoomsBinding.inflate(inflater, container, false)
+        roomsAdapter = RoomCardAdapter()
+        binding = FragmentRoomsBinding.inflate(inflater, container, false)
         val root: View = binding.root
-
-        _binding?.btnAdd?.setOnClickListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                roomRepository.createRoom(Room("Jatin-123"))
-            }
-        }
         return root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setUpRecyclerView()
+        observeData()
+        homeViewModel.refresh()
+    }
+
+    private fun setUpRecyclerView() {
+        binding.recRooms.apply {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(activity)
+            adapter = roomsAdapter
+        }
+    }
+
+    private fun observeData() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            homeViewModel.roomsState.collectLatest {
+                when (it) {
+                    is UiState.Error -> {}
+                    UiState.Initial -> {}
+                    UiState.Loading -> {}
+                    is UiState.Success<List<Room>> -> {
+                        roomsAdapter.update(it.data)
+                    }
+                }
+            }
+        }
     }
 }

@@ -4,11 +4,12 @@ import com.application.studyroom.data.model.Room
 import com.application.studyroom.ui.state.UiState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.random.Random
 
 interface RoomRepository {
     suspend fun createRoom(room: Room): Flow<UiState<Room>>
-    suspend fun getRooms(): Flow<UiState<List<Room>>>
+    suspend fun getRooms(roomsState: MutableStateFlow<UiState<List<Room>>>)
     suspend fun joinRoom(roomCode: String, state: MutableSharedFlow<UiState<Room>>)
 
     fun getNewRoomCode(): String {

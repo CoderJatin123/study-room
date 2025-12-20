@@ -1,5 +1,6 @@
 package com.application.studyroom.ui.activity
 
+import android.app.Activity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -80,7 +81,8 @@ class JoinRoomActivity : BaseActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                         roomsViewModel.resetJoinRoomState()
-                        finish() // Close activity after successful join
+                        setResult(RESULT_OK)
+                        finish()
                     }
 
                     is UiState.Error -> {
