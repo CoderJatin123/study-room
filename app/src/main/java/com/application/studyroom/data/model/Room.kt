@@ -14,3 +14,6 @@ data class Room(
     // Null default values create a no-argument default constructor, which is needed
     // for deserialization from a DataSnapshot.
 }
+
+class RoomItem(val isLoading: Boolean = false, val room: Room?= null)
+fun Room.toRoomItem() = RoomItem(false, this)

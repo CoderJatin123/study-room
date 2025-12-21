@@ -6,10 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.application.studyroom.data.model.Room
+import com.application.studyroom.data.model.RoomItem
+import com.application.studyroom.data.model.toRoomItem
 import com.application.studyroom.databinding.FragmentRoomsBinding
 import com.application.studyroom.domain.repository.RoomRepository
 import com.application.studyroom.ui.adapter.RoomCardAdapter
@@ -28,7 +29,7 @@ class RoomsFragment : Fragment() {
 
     lateinit var roomsAdapter: RoomCardAdapter
 
-    private val homeViewModel : HomeViewModel by activityViewModels()
+    private val homeViewModel: HomeViewModel by activityViewModels()
 
     private lateinit var binding: FragmentRoomsBinding
     override fun onCreateView(
@@ -63,9 +64,13 @@ class RoomsFragment : Fragment() {
                 when (it) {
                     is UiState.Error -> {}
                     UiState.Initial -> {}
-                    UiState.Loading -> {}
+
+                    UiState.Loading -> {
+                        roomsAdapter.update(List(2) { RoomItem(true, null) })
+                    }
+
                     is UiState.Success<List<Room>> -> {
-                        roomsAdapter.update(it.data)
+                        roomsAdapter.update(it.data.map { it.toRoomItem() })
                     }
                 }
             }

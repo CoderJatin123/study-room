@@ -139,7 +139,6 @@
     <style name="cardContent" parent="Widget.MaterialComponents.TextView">
         <item name="fontFamily">@font/poppins</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:alpha">0.9</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 
