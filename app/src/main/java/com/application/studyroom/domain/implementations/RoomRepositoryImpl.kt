@@ -11,7 +11,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.GenericTypeIndicator
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.tasks.await
@@ -22,26 +21,33 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
     private val database: DatabaseReference = Firebase.database.reference
     val auth: FirebaseAuth = Firebase.auth
 
-    override suspend fun createRoom(room: Room): Flow<UiState<Room>> {
-        val state = MutableSharedFlow<UiState<Room>>()
+    override suspend fun createRoom(
+        name: String,
+        description: String,
+        state: MutableSharedFlow<UiState<String>>
+    ) {
         state.emit(UiState.Loading)
         val code = getNewRoomCode()
         try {
             auth.currentUser?.let {
-                room.createdBy = it.uid
-                room.createdByName = auth.currentUser!!.displayName
+                var room = Room(
+                    createdBy = it.uid,
+                    name= name,
+                    description = description,
+                    createdByName = auth.currentUser!!.displayName,
+                    createdAt = System.currentTimeMillis()
+                )
                 database.child("rooms").child(code).setValue(room).await()
-                state.emit(UiState.Success(room))
+                state.emit(UiState.Success(code))
             }
-
         } catch (e: Exception) {
             Log.e("RoomRepository", "Failed to create room", e)
             state.emit(UiState.Error("Failed to create room"))
         }
-        return state
     }
 
     override suspend fun getRooms(state: MutableStateFlow<UiState<List<Room>>>) {
+        Log.d("RoomsRepository", "getRooms: ")
         state.emit(UiState.Loading)
         try {
             auth.currentUser?.let {
@@ -63,7 +69,7 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
                             ?.let { room ->
                                 rooms.add(room)
                             }
-                    };
+                    }
                 }
                 state.emit(UiState.Success(rooms))
 
@@ -105,7 +111,7 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
             }
 
             // Check if user is already a participant
-            val participantsRef = roomRef.child("participants")
+            val participantsRef = roomRef.child("participadents")
             val participantsSnapshot = participantsRef.get().await()
 
             val currentParticipants = if (participantsSnapshot.exists()) {

@@ -1,8 +1,6 @@
 package com.application.studyroom.ui.activity
 
-import android.app.Activity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
@@ -12,7 +10,11 @@ import androidx.lifecycle.lifecycleScope
 import com.application.studyroom.BaseActivity
 import com.application.studyroom.databinding.ActivityJoinRoomBinding
 import com.application.studyroom.ui.state.UiState
-import com.application.studyroom.ui.viewmodel.RoomsViewModel
+import com.application.studyroom.ui.viewmodel.JoinRoomsViewModel
+import com.application.studyroom.utils.RESULT_OK_JOIN_ROOM
+import com.application.studyroom.utils.resetErrorHint
+import com.application.studyroom.utils.setErrorHint
+import com.application.studyroom.utils.showToast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -20,7 +22,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class JoinRoomActivity : BaseActivity() {
     private lateinit var binding: ActivityJoinRoomBinding
-    private val roomsViewModel: RoomsViewModel by viewModels()
+    private val roomsViewModel: JoinRoomsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,36 +68,20 @@ class JoinRoomActivity : BaseActivity() {
     private fun observeJoinRoomState() {
         lifecycleScope.launch {
             roomsViewModel.joinRoomState.collectLatest { state ->
-                when (state) {
-                    is UiState.Loading -> {
-                        binding.btnJoin.isEnabled = false
-                        binding.btnJoin.text = "Joining..."
-                    }
+                binding.apply {
+                    btnJoin.text = if (state == UiState.Loading) "Joining..." else "Join Room"
+                    btnJoin.isEnabled = state != UiState.Loading
+                    edtRoomCode.isEnabled = state != UiState.Loading
 
-                    is UiState.Success -> {
-                        binding.btnJoin.isEnabled = true
-                        binding.btnJoin.text = "Join Room"
-                        Toast.makeText(
-                            this@JoinRoomActivity,
-                            "Successfully joined the room!",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                    if (state is UiState.Success) {
+                        tlRoomCode.resetErrorHint()
+                        showToast("Successfully joined the room!")
                         roomsViewModel.resetJoinRoomState()
-                        setResult(RESULT_OK)
+                        setResult(RESULT_OK_JOIN_ROOM)
                         finish()
-                    }
-
-                    is UiState.Error -> {
-                        binding.btnJoin.isEnabled = true
-                        binding.btnJoin.text = "Join Room"
-                        binding.tlRoomCode.error = state.error
-                        binding.tlRoomCode.isErrorEnabled = true
+                    } else if (state is UiState.Error) {
                         roomsViewModel.resetJoinRoomState()
-                    }
-
-                    is UiState.Initial -> {
-                        binding.btnJoin.isEnabled = true
-                        binding.btnJoin.text = "Join Room"
+                        tlRoomCode.setErrorHint(state.error)
                     }
                 }
             }

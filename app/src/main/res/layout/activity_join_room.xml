@@ -21,13 +21,13 @@
             style="@style/inputTextLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="12dp"
             app:counterEnabled="true"
-            android:hint="@string/room_code">
+            android:hint="@string/enter_room_code">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtRoomCode"
-                style="@style/ThemeOverlay.Material3.TextInputEditText.OutlinedBox"
+                style="@style/inputTextLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:inputType="textEmailAddress"

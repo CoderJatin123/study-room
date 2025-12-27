@@ -101,8 +101,8 @@
     </style>
 
     <dimen name="customRadios">8dp</dimen>
-    <dimen name="btnPadding">14dp</dimen>
-    <dimen name="fieldTextSize">13dp</dimen>
+    <dimen name="btnPadding">16dp</dimen>
+    <dimen name="fieldTextSize">14dp</dimen>
 
     <style name="primaryBtn" parent="ShapeAppearanceOverlay.Material3.Button">
         <item name="backgroundColor">@color/primary_color</item>

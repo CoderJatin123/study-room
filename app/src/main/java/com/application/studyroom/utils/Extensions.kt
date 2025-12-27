@@ -1,13 +1,16 @@
 package com.application.studyroom.utils
 
+import android.content.Context
 import android.content.Intent
 import android.util.Patterns
 import android.view.View
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.application.studyroom.R
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textview.MaterialTextView
 
 fun String.isValidEmail() = Patterns.EMAIL_ADDRESS.matcher(this).matches()
@@ -41,5 +44,18 @@ fun ImageView.setLoading(
     } else {
         foreground = null
     }
+}
+
+fun Context.showToast(msg: String) {
+    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+}
+
+fun TextInputLayout.setErrorHint(errorString: String){
+        error = errorString
+        isErrorEnabled = true
+}
+fun TextInputLayout.resetErrorHint(errorString: String?=null){
+        error = ""
+        isErrorEnabled = false
 }
 

@@ -13,18 +13,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(val roomRepository: RoomRepository) : ViewModel() {
+class JoinRoomsViewModel @Inject constructor(private val roomRepository: RoomRepository) : ViewModel() {
 
-     private val _roomsState = MutableStateFlow<UiState<List<Room>>>(UiState.Initial)
-    val roomsState: StateFlow<UiState<List<Room>>> = _roomsState.asStateFlow()
+    private val _joinRoomState = MutableStateFlow<UiState<Room>>(UiState.Initial)
+    val joinRoomState: StateFlow<UiState<Room>> = _joinRoomState.asStateFlow()
 
-    init {
-        refresh()
+    fun joinRoom(roomCode: String) {
+        viewModelScope.launch {
+            roomRepository.joinRoom(roomCode, _joinRoomState)
+        }
     }
 
-    fun refresh() {
-        viewModelScope.launch {
-            roomRepository.getRooms(_roomsState)
-        }
+    fun resetJoinRoomState() {
+        _joinRoomState.value = UiState.Initial
     }
 }

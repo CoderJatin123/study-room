@@ -47,7 +47,6 @@ class RoomsFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpRecyclerView()
         observeData()
-        homeViewModel.refresh()
     }
 
     private fun setUpRecyclerView() {
