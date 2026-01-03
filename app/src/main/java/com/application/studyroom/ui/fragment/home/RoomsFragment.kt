@@ -10,12 +10,15 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.application.studyroom.data.model.Room
 import com.application.studyroom.data.model.RoomItem
+import com.application.studyroom.data.model.toJson
 import com.application.studyroom.data.model.toRoomItem
 import com.application.studyroom.databinding.FragmentRoomsBinding
 import com.application.studyroom.domain.repository.RoomRepository
+import com.application.studyroom.ui.activity.AnnouncementsViewActivity
 import com.application.studyroom.ui.adapter.RoomCardAdapter
 import com.application.studyroom.ui.state.UiState
 import com.application.studyroom.ui.viewmodel.HomeViewModel
+import com.application.studyroom.utils.startNewActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -37,7 +40,11 @@ class RoomsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        roomsAdapter = RoomCardAdapter()
+        roomsAdapter = RoomCardAdapter {
+            requireActivity().startNewActivity<AnnouncementsViewActivity>{
+                putExtra("room",it.toJson())
+            }
+        }
         binding = FragmentRoomsBinding.inflate(inflater, container, false)
         val root: View = binding.root
         return root

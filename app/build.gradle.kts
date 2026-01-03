@@ -75,4 +75,6 @@ dependencies {
     //Glide
     implementation(libs.glide)
 
+    implementation(libs.gson)
+
 }

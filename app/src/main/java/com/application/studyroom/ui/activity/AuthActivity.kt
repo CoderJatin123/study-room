@@ -75,7 +75,7 @@ class AuthActivity : BaseActivity() {
     }
 
     fun onAuthComplete() {
-        startNewActivity(MainActivity::class.java)
+        startNewActivity<MainActivity>{}
         finish()
     }
 

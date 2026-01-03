@@ -153,10 +153,15 @@
 
     <color name="shimmer_bg">#E4E4E4</color>
 
+    <color name="stroke">#E2E5E9</color>
+
     <!-- Text Colors -->
-    <color name="text_primary">#1F2937</color>
+    <!--    <color name="text_primary">#1F2937</color>-->
+    <color name="text_primary">#363636</color>
     <color name="text_secondary">#6B7280</color>
     <color name="text_hint">#9CA3AF</color>
+    <color name="card_title">#363636</color>
+    <color name="subTitle">#656C7B</color>
 
     <!-- Utility Colors -->
     <color name="white">#FFFFFF</color>

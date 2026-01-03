@@ -1,6 +1,7 @@
 package com.application.studyroom.domain.implementations
 
 import android.util.Log
+import com.application.studyroom.data.model.Announcement
 import com.application.studyroom.data.model.Room
 import com.application.studyroom.domain.repository.RoomRepository
 import com.application.studyroom.network.NetworkHelper
@@ -32,7 +33,7 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
             auth.currentUser?.let {
                 var room = Room(
                     createdBy = it.uid,
-                    name= name,
+                    name = name,
                     description = description,
                     createdByName = auth.currentUser!!.displayName,
                     createdAt = System.currentTimeMillis()
@@ -67,6 +68,7 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
                     if (roomSnapshot.exists()) {
                         roomSnapshot.getValue(object : GenericTypeIndicator<Room>() {})
                             ?.let { room ->
+                                room.code = roomCode
                                 rooms.add(room)
                             }
                     }
@@ -159,5 +161,98 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
             state.emit(UiState.Error("Failed to join room: ${e.localizedMessage ?: "Unknown error"}"))
         }
         return
+    }
+
+    override suspend fun createAnnouncement(
+        roomCode: String,
+        announcement: Announcement,
+        state: MutableStateFlow<UiState<Announcement>>
+    ) {
+        state.emit(UiState.Loading)
+        try {
+            // Check if user is authenticated
+            val currentUser = auth.currentUser
+            if (currentUser == null) {
+                state.emit(UiState.Error("User not authenticated"))
+                return
+            }
+
+            val userId = currentUser.uid
+
+            // Check if the room exists
+            val roomRef = database.child("rooms").child(roomCode)
+            val roomSnapshot = roomRef.get().await()
+
+            if (!roomSnapshot.exists()) {
+                Log.d("RoomRepository", "createAnnouncement: Room not found")
+                state.emit(UiState.Error("Room not found"))
+                return
+            }
+
+            // Get the room data
+            val room = roomSnapshot.getValue(object : GenericTypeIndicator<Room>() {})
+            if (room == null) {
+                state.emit(UiState.Error("Failed to parse room data"))
+                return
+            }
+
+            // Set timestamp if not provided
+            if (announcement.timeStamp == null) {
+                announcement.timeStamp = System.currentTimeMillis()
+            }
+
+            // Set authorId to current user
+            announcement.authorId = userId
+
+            // Get existing announcements list
+            val announcementsRef = database.child("rooms").child(roomCode).child("announcements")
+            val announcementsSnapshot = announcementsRef.get().await()
+
+            val currentAnnouncements = if (announcementsSnapshot.exists()) {
+                announcementsSnapshot.getValue(object :
+                    GenericTypeIndicator<List<Announcement>>() {})
+                    ?: emptyList()
+            } else {
+                emptyList()
+            }
+
+            // Add new announcement to the list
+            val updatedAnnouncements = currentAnnouncements.toMutableList().apply {
+                add(announcement)
+            }
+
+            // Save the updated list to the database
+            announcementsRef.setValue(updatedAnnouncements).await()
+
+            Log.d("RoomRepository", "createAnnouncement: Announcement created successfully")
+            state.emit(UiState.Success(announcement))
+
+        } catch (e: Exception) {
+            Log.e("RoomRepository", "Failed to create announcement", e)
+            state.emit(UiState.Error("Failed to create announcement: ${e.localizedMessage ?: "Unknown error"}"))
+        }
+    }
+
+    override suspend fun getAllAnnouncementByRoomId(
+        roomId: String,
+        state: MutableSharedFlow<UiState<List<Announcement>>>
+    ) {
+        state.emit(UiState.Loading)
+        try {
+            val announcementsRef = database.child("rooms").child(roomId).child("announcements")
+            val snapshot = announcementsRef.get().await()
+
+            val announcements = if (snapshot.exists()) {
+                snapshot.getValue(object : GenericTypeIndicator<List<Announcement>>() {})
+                    ?: emptyList()
+            } else {
+                emptyList()
+            }
+            state.emit(UiState.Success(announcements))
+
+        } catch (e: Exception) {
+            Log.e("RoomRepository", "Failed to get announcements", e)
+            state.emit(UiState.Error("Failed to get announcements: ${e.localizedMessage ?: "Unknown error"}"))
+        }
     }
 }

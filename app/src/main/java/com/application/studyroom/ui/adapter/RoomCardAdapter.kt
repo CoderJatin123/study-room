@@ -4,13 +4,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.application.studyroom.data.model.Room
 import com.application.studyroom.data.model.RoomItem
 import com.application.studyroom.databinding.ItemRoomCardBinding
 import com.application.studyroom.ui.adapter.RoomCardAdapter.CardViewHolder
 import com.application.studyroom.utils.setData
 import com.application.studyroom.utils.setLoading
 
-class RoomCardAdapter() : RecyclerView.Adapter<CardViewHolder>() {
+class RoomCardAdapter(val onRoomClick: (Room) -> Unit) : RecyclerView.Adapter<CardViewHolder>() {
     private val rooms = ArrayList<RoomItem>()
     fun update(list: List<RoomItem>) {
         rooms.clear()
@@ -35,13 +36,13 @@ class RoomCardAdapter() : RecyclerView.Adapter<CardViewHolder>() {
         holder: CardViewHolder,
         position: Int
     ) {
-        holder.bind(rooms[position])
+        holder.bind(rooms[position], onRoomClick)
     }
 
     override fun getItemCount() = rooms.size
 
     class CardViewHolder(val binding: ItemRoomCardBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(roomItem: RoomItem) {
+        fun bind(roomItem: RoomItem, onRoomClick: (Room) -> Unit) {
             binding.apply {
                 roomItem.room.also {
                     cardHeading.setData(it?.name.toString(), roomItem.isLoading)
@@ -50,6 +51,9 @@ class RoomCardAdapter() : RecyclerView.Adapter<CardViewHolder>() {
                 }
                 ivMenu.isVisible = !roomItem.isLoading
                 cvRoom.strokeWidth = if (roomItem.isLoading) 0 else 3
+                roomItem.room?.let { room ->
+                    cvRoom.setOnClickListener { onRoomClick.invoke(room) }
+                }
             }
         }
     }

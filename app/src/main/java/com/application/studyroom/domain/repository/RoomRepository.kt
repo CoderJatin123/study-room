@@ -1,5 +1,6 @@
 package com.application.studyroom.domain.repository
 
+import com.application.studyroom.data.model.Announcement
 import com.application.studyroom.data.model.Room
 import com.application.studyroom.ui.state.UiState
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -7,9 +8,24 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.random.Random
 
 interface RoomRepository {
-    suspend fun createRoom(name: String,description: String, state: MutableSharedFlow<UiState<String>>)
+    suspend fun createRoom(
+        name: String,
+        description: String,
+        state: MutableSharedFlow<UiState<String>>
+    )
+
     suspend fun getRooms(roomsState: MutableStateFlow<UiState<List<Room>>>)
     suspend fun joinRoom(roomCode: String, state: MutableSharedFlow<UiState<Room>>)
+    suspend fun createAnnouncement(
+        roomId: String,
+        announcement: Announcement,
+        state: MutableStateFlow<UiState<Announcement>>
+    )
+
+    suspend fun getAllAnnouncementByRoomId(
+        roomId: String,
+        state: MutableSharedFlow<UiState<List<Announcement>>>
+    )
 
     fun getNewRoomCode(): String {
         val builder = StringBuilder()

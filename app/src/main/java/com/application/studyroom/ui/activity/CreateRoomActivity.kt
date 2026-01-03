@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
+import com.application.studyroom.BaseActivity
 import com.application.studyroom.R
 import com.application.studyroom.databinding.ActivityCreateRoomBinding
 import com.application.studyroom.ui.state.UiState
@@ -24,7 +25,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class CreateRoomActivity : AppCompatActivity() {
+class CreateRoomActivity : BaseActivity() {
     private lateinit var binding: ActivityCreateRoomBinding
     private val roomsViewModel: CreateRoomsViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +33,12 @@ class CreateRoomActivity : AppCompatActivity() {
         initViews()
         initClickListeners()
         observeCreateRoomState()
+    }
+
+    override fun onBaseBackPressed() {
+        if(roomsViewModel.creteRoomState == UiState.Loading){
+            showToast("Please wait for the room to be created")
+        }
     }
 
     private fun observeCreateRoomState() {

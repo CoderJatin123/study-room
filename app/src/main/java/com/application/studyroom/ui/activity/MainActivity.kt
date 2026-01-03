@@ -44,7 +44,7 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         if (authRepository.isUserAvailable() == null) {
-            startNewActivity(AuthActivity::class.java)
+            startNewActivity<AuthActivity>{ }
             finish()
         }
 
@@ -128,7 +128,7 @@ class MainActivity : BaseActivity() {
     private fun onLogout() {
         lifecycleScope.launch {
             authRepository.logout()
-            startNewActivity(AuthActivity::class.java)
+            startNewActivity<AuthActivity>{ }
             finish()
         }
     }

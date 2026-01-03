@@ -17,14 +17,23 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ui.activity.CreateAnnouncementActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme"/>
+        <activity
+            android:name=".ui.activity.AnnouncementsViewActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme"/>
+        <activity
             android:name=".ui.activity.CreateRoomActivity"
             android:exported="false"
-            android:label="@string/create_room"/>
+            android:label="@string/create_room"
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".ui.activity.JoinRoomActivity"
             android:exported="false"
-            android:theme="@style/AppTheme"
-            android:label="@string/join_room" />
+            android:label="@string/join_room"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.activity.MainActivity"
             android:exported="false"

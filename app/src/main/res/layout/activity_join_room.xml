@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             app:counterEnabled="true"
-            android:hint="@string/enter_room_code">
+            android:hint="@string/room_code">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edtRoomCode"
