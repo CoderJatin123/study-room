@@ -1,89 +1,107 @@
 package com.application.studyroom.domain.googe_auth
 
 import android.content.Context
-import android.content.Intent
-import android.content.IntentSender
-import com.application.studyroom.R
-import com.application.studyroom.data.model.UserData
-import com.application.studyroom.utils.Constants
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.SignInClient
+import android.util.Log
+import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.ClearCredentialStateRequest.Companion.TYPE_CLEAR_CREDENTIAL_STATE
+import androidx.credentials.CredentialManager
+import androidx.credentials.CustomCredential
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
+import com.application.studyroom.utils.Constants.WEB_CLIENT_ID
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
-import kotlin.coroutines.cancellation.CancellationException
 
 
 class GoogleAuth(
-    private val oneTapClient: SignInClient
+    private val context: Context
 ) {
     private val auth = Firebase.auth
     private val database: DatabaseReference = Firebase.database.reference
-    suspend fun signIn(): IntentSender? {
-        val result = try {
-            oneTapClient.beginSignIn(
-                buildSignInRequest()
-            ).await()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            if (e is CancellationException) throw e
-            null
-        }
-        return result?.pendingIntent?.intentSender
-    }
+    val credentialManager = CredentialManager.create(context)
 
-    suspend fun signInWithIntent(intent: Intent): SignInResult {
-        val credential = oneTapClient.getSignInCredentialFromIntent(intent)
-        val googleIdToken = credential.googleIdToken
-        val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
-        return try {
-            val user = auth.signInWithCredential(googleCredentials).await().user
-            val userId = user?.uid ?: ""
+    val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+        .setFilterByAuthorizedAccounts(true)
+        .setServerClientId(WEB_CLIENT_ID)
+        .setAutoSelectEnabled(true)
+        .build()
 
-            val usersRef = database.child("users").child(userId)
-            val snapshot = usersRef.get().await()
+    val signInWithGoogleOption: GetSignInWithGoogleOption = GetSignInWithGoogleOption.Builder(
+        serverClientId = WEB_CLIENT_ID
+    ).build()
 
-            if (!snapshot.exists()) {
-                usersRef.child("display_name").setValue(user?.displayName.toString()).await()
-                usersRef.child("email").setValue(user?.email.toString()).await()
-                usersRef.child("profilePictureUrl").setValue(user?.photoUrl.toString()).await()
+    val request: GetCredentialRequest = GetCredentialRequest.Builder()
+        .addCredentialOption(signInWithGoogleOption)
+        .build()
+
+    suspend fun signInWithIntent(
+        onSuccess: (FirebaseUser) -> Unit,
+        onFailed: (String) -> Unit
+    ) {
+        try {
+            val result = credentialManager.getCredential(
+                request = request,
+                context = context,
+            ).credential
+
+            if (result is CustomCredential) {
+                if (result.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                    try {
+                        val googleIdTokenCredential = GoogleIdTokenCredential
+                            .createFrom(result.data)
+                        val googleCredentials =
+                            GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
+                        try {
+                            val user = auth.signInWithCredential(googleCredentials).await().user
+                            user?.let { user ->
+                                val userId = user.uid
+
+                                val usersRef = database.child("users").child(userId)
+                                val snapshot = usersRef.get().await()
+
+                                if (!snapshot.exists()) {
+                                    usersRef.child("display_name")
+                                        .setValue(user.displayName.toString()).await()
+                                    usersRef.child("email").setValue(user.email.toString()).await()
+                                    usersRef.child("profilePictureUrl")
+                                        .setValue(user.photoUrl.toString()).await()
+                                }
+                                SignInResult(
+                                    data = user,
+                                    errorMessage = null
+                                )
+                                onSuccess(user)
+                            } ?: run {
+                                onFailed("Invalid user")
+                            }
+                        } catch (e: Exception) {
+                            onFailed(e.localizedMessage?.toString() ?: "")
+                        }
+                    } catch (e: GoogleIdTokenParsingException) {
+                        onFailed("Invalid google id")
+                        Log.e("TAG", "Received an invalid google id token response", e)
+                    }
+                }
             }
-
-            SignInResult(
-                data = user,
-                errorMessage = null
-            )
-        } catch (e: Exception) {
-            if (e is CancellationException) throw e
-            SignInResult(
-                data = null,
-                errorMessage = e.message
-            )
+        } catch (e: GetCredentialException) {
+            onFailed(e.errorMessage.toString())
         }
     }
 
     suspend fun signOut() {
-        try {
-            oneTapClient.signOut().await()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            if (e is CancellationException) throw e
-        }
-    }
-
-    private fun buildSignInRequest(): BeginSignInRequest {
-        return BeginSignInRequest.Builder()
-            .setGoogleIdTokenRequestOptions(
-                BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                    .setSupported(true)
-                    .setFilterByAuthorizedAccounts(false)
-                    .setServerClientId(Constants.WEB_CLIENT_ID)
-                    .build()
+        credentialManager.clearCredentialState(
+            ClearCredentialStateRequest(
+                TYPE_CLEAR_CREDENTIAL_STATE
             )
-            .setAutoSelectEnabled(true)
-            .build()
+        )
     }
 }
