@@ -7,14 +7,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.application.studyroom.BaseActivity
-import com.application.studyroom.data.model.Announcement
 import com.application.studyroom.data.model.Room
 import com.application.studyroom.data.model.getRoom
 import com.application.studyroom.data.model.toJson
 import com.application.studyroom.databinding.ActivityAnnouncementsViewBinding
+import com.application.studyroom.domain.AnnouncementEntity
 import com.application.studyroom.ui.adapter.AnnouncementAdapter
 import com.application.studyroom.ui.state.UiState
 import com.application.studyroom.ui.viewmodel.AnnouncementsViewModel
@@ -69,8 +70,9 @@ class AnnouncementsViewActivity : BaseActivity() {
 
                     }
 
-                    is UiState.Success<List<Announcement>> -> {
+                    is UiState.Success<List<AnnouncementEntity>> -> {
                         announcementAdapter.update(it.data)
+                        binding.tvEmpty.isVisible = it.data.isEmpty()
                     }
                 }
             }

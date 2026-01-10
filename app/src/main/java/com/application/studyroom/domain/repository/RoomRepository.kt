@@ -2,6 +2,7 @@ package com.application.studyroom.domain.repository
 
 import com.application.studyroom.data.model.Announcement
 import com.application.studyroom.data.model.Room
+import com.application.studyroom.domain.AnnouncementEntity
 import com.application.studyroom.ui.state.UiState
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,7 @@ interface RoomRepository {
 
     suspend fun getAllAnnouncementByRoomId(
         roomId: String,
-        state: MutableSharedFlow<UiState<List<Announcement>>>
+        state: MutableSharedFlow<UiState<List<AnnouncementEntity>>>
     )
 
     fun getNewRoomCode(): String {

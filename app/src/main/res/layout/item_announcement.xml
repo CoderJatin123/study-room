@@ -64,12 +64,15 @@
                 style="@style/cardHeading"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginStart="10dp"
                 android:ellipsize="end"
                 android:maxLines="2"
+                app:layout_constraintBottom_toTopOf="@+id/tvAuthorPosition"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/ivAuthorImage"
                 app:layout_constraintTop_toTopOf="@+id/ivAuthorImage"
+                app:layout_constraintVertical_chainStyle="packed"
                 tools:text="Jatin Lad" />
 
             <androidx.appcompat.widget.AppCompatTextView
@@ -77,15 +80,16 @@
                 style="@style/cardContentMedium"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
+                android:layout_marginTop="1dp"
                 android:ellipsize="end"
                 android:maxLines="2"
                 android:text="Administrator"
                 android:textSize="10sp"
                 app:layout_constraintBottom_toBottomOf="@+id/ivAuthorImage"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/ivAuthorImage"
-                app:layout_constraintTop_toBottomOf="@id/tvAuthorName" />
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@+id/tvAuthorName"
+                app:layout_constraintTop_toBottomOf="@+id/tvAuthorName" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tvTitle"

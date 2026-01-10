@@ -1,9 +1,11 @@
 package com.application.studyroom.data.model
 
+import com.google.firebase.database.IgnoreExtraProperties
 
+@IgnoreExtraProperties
 data class UserData(
-    val userId: String,
-    val username: String?,
-    val email: String?,
-    val profilePictureUrl: String?
+    var userId: String = "",
+    var name: String? = null,
+    var email: String? = null,
+    var profileUrl: String? = null
 )

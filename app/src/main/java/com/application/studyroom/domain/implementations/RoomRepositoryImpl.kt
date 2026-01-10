@@ -3,6 +3,8 @@ package com.application.studyroom.domain.implementations
 import android.util.Log
 import com.application.studyroom.data.model.Announcement
 import com.application.studyroom.data.model.Room
+import com.application.studyroom.data.model.UserData
+import com.application.studyroom.domain.AnnouncementEntity
 import com.application.studyroom.domain.repository.RoomRepository
 import com.application.studyroom.network.NetworkHelper
 import com.application.studyroom.ui.state.UiState
@@ -21,6 +23,8 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
 
     private val database: DatabaseReference = Firebase.database.reference
     val auth: FirebaseAuth = Firebase.auth
+    val cachedUsersData = HashMap<String, UserData>()
+    val cachedAnnouncement = HashMap<String, Announcement>()
 
     override suspend fun createRoom(
         name: String,
@@ -235,7 +239,7 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
 
     override suspend fun getAllAnnouncementByRoomId(
         roomId: String,
-        state: MutableSharedFlow<UiState<List<Announcement>>>
+        state: MutableSharedFlow<UiState<List<AnnouncementEntity>>>
     ) {
         state.emit(UiState.Loading)
         try {
@@ -248,11 +252,47 @@ class RoomRepositoryImpl @Inject constructor(val networkHelper: NetworkHelper) :
             } else {
                 emptyList()
             }
-            state.emit(UiState.Success(announcements))
+            val announcementEntityList = ArrayList<AnnouncementEntity>()
+            announcements.forEach { announcement ->
+                getBasicDetailsByUserId(announcement.authorId.toString(), onSuccess = {
+                    announcementEntityList.add(
+                        AnnouncementEntity(
+                            announcement = announcement,
+                            authorData = it
+                        )
+                    )
+                }, onFail = {
+
+                })
+            }
+            state.emit(UiState.Success(announcementEntityList))
 
         } catch (e: Exception) {
             Log.e("RoomRepository", "Failed to get announcements", e)
             state.emit(UiState.Error("Failed to get announcements: ${e.localizedMessage ?: "Unknown error"}"))
+        }
+    }
+
+    suspend fun getBasicDetailsByUserId(
+        id: String,
+        onSuccess: (UserData) -> Unit,
+        onFail: () -> Unit
+    ) {
+        if(cachedUsersData.get(id)!=null){
+            onSuccess(cachedUsersData.get(id)!!)
+            return
+        }
+        val usersRef = database.child("users").child(id)
+        val snapshot = usersRef.get().await()
+
+        if (snapshot.exists()) {
+            var user = snapshot.getValue(object : GenericTypeIndicator<UserData>() {})
+            user?.apply {
+                userId = id
+                onSuccess(this)
+            } ?: run {
+                onFail()
+            }
         }
     }
 }

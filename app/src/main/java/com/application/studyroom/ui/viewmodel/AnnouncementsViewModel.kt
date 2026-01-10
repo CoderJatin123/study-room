@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.application.studyroom.data.model.Announcement
 import com.application.studyroom.data.model.Room
+import com.application.studyroom.domain.AnnouncementEntity
 import com.application.studyroom.domain.repository.RoomRepository
 import com.application.studyroom.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,10 +17,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AnnouncementsViewModel @Inject constructor(val roomRepository: RoomRepository) : ViewModel() {
     lateinit var room: Room
-    var announcement = Announcement()
     private val _announcementsListState =
-        MutableStateFlow<UiState<List<Announcement>>>(UiState.Initial)
-    val announcementsListState: StateFlow<UiState<List<Announcement>>> =
+        MutableStateFlow<UiState<List<AnnouncementEntity>>>(UiState.Initial)
+    val announcementsListState: StateFlow<UiState<List<AnnouncementEntity>>> =
         _announcementsListState.asStateFlow()
 
     private val _createAnnouncementState =

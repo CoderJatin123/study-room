@@ -1,10 +1,7 @@
 package com.application.studyroom.domain.googe_auth
 
-import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
-import com.application.studyroom.R
-import com.application.studyroom.data.model.UserData
 import com.application.studyroom.utils.Constants
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -47,9 +44,9 @@ class GoogleAuth(
             val snapshot = usersRef.get().await()
 
             if (!snapshot.exists()) {
-                usersRef.child("display_name").setValue(user?.displayName.toString()).await()
+                usersRef.child("name").setValue(user?.displayName.toString()).await()
                 usersRef.child("email").setValue(user?.email.toString()).await()
-                usersRef.child("profilePictureUrl").setValue(user?.photoUrl.toString()).await()
+                usersRef.child("profileUrl").setValue(user?.photoUrl.toString()).await()
             }
 
             SignInResult(
