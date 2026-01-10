@@ -20,12 +20,14 @@ import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class SignupFragment : Fragment() {
 
     private lateinit var binding: FragmentSignupBinding
-    private val viewModel: AuthViewModel by viewModels()
+    @Inject
+    lateinit var viewModel: AuthViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

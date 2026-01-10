@@ -7,7 +7,6 @@ import com.application.studyroom.data.model.UserCredential
 import com.application.studyroom.domain.googe_auth.GoogleAuth
 import com.application.studyroom.domain.repository.AuthRepository
 import com.application.studyroom.network.NetworkHelper
-import com.google.android.gms.auth.api.identity.Identity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -52,12 +51,12 @@ class FirebaseAuthentication @Inject constructor(private val networkHelper: Netw
     }
 
     override fun getGoogleAuthClient(context: Context): GoogleAuth {
-        if (googleAuth == null) googleAuth = GoogleAuth(Identity.getSignInClient(context))
+        if (googleAuth == null) googleAuth = GoogleAuth(context)
         return googleAuth!!
     }
 
     override fun isUserAvailable(): FirebaseUser? {
-        Log.d("FirebaseAuth", "isUserAvailable: ${auth?.currentUser?.uid}")
+        Log.d("FirebaseAuth", "isUserAvailable: ${auth.currentUser?.uid}")
         return auth.currentUser
     }
 
