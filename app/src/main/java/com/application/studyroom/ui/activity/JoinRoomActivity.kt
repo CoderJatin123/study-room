@@ -1,13 +1,12 @@
 package com.application.studyroom.ui.activity
 
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import com.application.studyroom.BaseActivity
+import com.application.studyroom.custome.BaseActivity
 import com.application.studyroom.databinding.ActivityJoinRoomBinding
 import com.application.studyroom.ui.state.UiState
 import com.application.studyroom.ui.viewmodel.JoinRoomsViewModel
@@ -93,7 +92,6 @@ class JoinRoomActivity : BaseActivity() {
     }
 
     private fun initViews() {
-        enableEdgeToEdge()
         setContentView(ActivityJoinRoomBinding.inflate(layoutInflater).also { binding = it }.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

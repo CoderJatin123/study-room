@@ -1,4 +1,4 @@
-package com.application.studyroom
+package com.application.studyroom.custome
 
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
@@ -8,6 +8,7 @@ open class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         onBackPressedDispatcher.addCallback(onBackPressCallback)
         super.onCreate(savedInstanceState)
+        supportActionBar?.elevation = 0F
     }
 
     val onBackPressCallback = object : OnBackPressedCallback(true) {

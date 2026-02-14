@@ -2,7 +2,6 @@ package com.application.studyroom.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
@@ -10,7 +9,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.application.studyroom.BaseActivity
+import com.application.studyroom.custome.BaseActivity
 import com.application.studyroom.data.model.Room
 import com.application.studyroom.data.model.getRoom
 import com.application.studyroom.data.model.toJson
@@ -94,7 +93,6 @@ class AnnouncementsViewActivity : BaseActivity() {
     }
 
     private fun initViews() {
-        enableEdgeToEdge()
         setContentView(
             ActivityAnnouncementsViewBinding.inflate(layoutInflater).also { binding = it }.root
         )

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.widget.PopupMenu
@@ -15,11 +16,13 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.application.studyroom.BaseActivity
 import com.application.studyroom.R
+import com.application.studyroom.custome.BaseActivity
 import com.application.studyroom.databinding.ActivityMainBinding
 import com.application.studyroom.databinding.NavHeaderMainBinding
 import com.application.studyroom.domain.repository.AuthRepository
+import com.application.studyroom.ui.state.UiState
+import com.application.studyroom.ui.viewmodel.AuthViewModel
 import com.application.studyroom.ui.viewmodel.HomeViewModel
 import com.application.studyroom.utils.RESULT_OK_CREATE_ROOM
 import com.application.studyroom.utils.RESULT_OK_JOIN_ROOM
@@ -36,6 +39,8 @@ class MainActivity : BaseActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val homeViewModel: HomeViewModel by viewModels()
+    @Inject
+    lateinit var authViewModel: AuthViewModel
 
     @Inject
     lateinit var authRepository: AuthRepository
@@ -44,13 +49,11 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         if (authRepository.isUserAvailable() == null) {
-            startNewActivity<AuthActivity>{ }
+            startNewActivity<AuthActivity> { }
             finish()
         }
 
         setContentView(binding.root)
-
-        //setSupportActionBar(binding.appBarMain.toolbar)
 
         binding.appBarMain.fab.setOnClickListener { view ->
             val popMenu = PopupMenu(this@MainActivity, view)
@@ -127,9 +130,11 @@ class MainActivity : BaseActivity() {
 
     private fun onLogout() {
         lifecycleScope.launch {
-            authRepository.logout()
-            startNewActivity<AuthActivity>{ }
-            finish()
+            authRepository.logout {
+                authViewModel.reset()
+                startNewActivity<AuthActivity> { }
+                finish()
+            }
         }
     }
 

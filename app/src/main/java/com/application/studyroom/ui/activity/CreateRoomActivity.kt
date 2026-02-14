@@ -4,15 +4,13 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import com.application.studyroom.BaseActivity
 import com.application.studyroom.R
+import com.application.studyroom.custome.BaseActivity
 import com.application.studyroom.databinding.ActivityCreateRoomBinding
 import com.application.studyroom.ui.state.UiState
 import com.application.studyroom.ui.viewmodel.CreateRoomsViewModel
@@ -36,8 +34,10 @@ class CreateRoomActivity : BaseActivity() {
     }
 
     override fun onBaseBackPressed() {
-        if(roomsViewModel.creteRoomState == UiState.Loading){
+        if (roomsViewModel.creteRoomState == UiState.Loading) {
             showToast("Please wait for the room to be created")
+        } else {
+            finish()
         }
     }
 
@@ -96,7 +96,6 @@ class CreateRoomActivity : BaseActivity() {
     }
 
     private fun initViews() {
-        enableEdgeToEdge()
         setContentView(ActivityCreateRoomBinding.inflate(layoutInflater).also { binding = it }.root)
         ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

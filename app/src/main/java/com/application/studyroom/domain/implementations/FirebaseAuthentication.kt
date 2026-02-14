@@ -60,10 +60,11 @@ class FirebaseAuthentication @Inject constructor(private val networkHelper: Netw
         return auth.currentUser
     }
 
-    override suspend fun logout() {
+    override suspend fun logout(onComplete: () -> Unit) {
         googleAuth?.apply {
             signOut()
         }
         auth.signOut()
+        onComplete()
     }
 }

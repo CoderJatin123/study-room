@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:name=".core.StudyRoomApp"
@@ -19,20 +21,23 @@
         <activity
             android:name=".ui.activity.CreateAnnouncementActivity"
             android:exported="false"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.activity.AnnouncementsViewActivity"
             android:exported="false"
-            android:theme="@style/AppTheme"/>
+            android:parentActivityName=".ui.activity.MainActivity"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.activity.CreateRoomActivity"
             android:exported="false"
             android:label="@string/create_room"
-            android:theme="@style/AppTheme"/>
+            android:parentActivityName=".ui.activity.MainActivity"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.activity.JoinRoomActivity"
             android:exported="false"
             android:label="@string/join_room"
+            android:parentActivityName=".ui.activity.MainActivity"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ui.activity.MainActivity"

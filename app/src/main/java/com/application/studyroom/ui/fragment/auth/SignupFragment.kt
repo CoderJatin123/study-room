@@ -105,7 +105,6 @@ class SignupFragment : Fragment() {
 
                     is UiState.Success<FirebaseUser> -> {
                         enableAllFields(true)
-                        (requireActivity() as AuthActivity).onAuthComplete()
                     }
                 }
             }

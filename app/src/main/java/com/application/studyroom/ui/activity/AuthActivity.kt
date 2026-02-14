@@ -1,13 +1,14 @@
 package com.application.studyroom.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import com.application.studyroom.BaseActivity
 import com.application.studyroom.R
+import com.application.studyroom.custome.BaseActivity
 import com.application.studyroom.databinding.ActivityAuthBinding
 import com.application.studyroom.network.NetworkHelper
 import com.application.studyroom.ui.state.UiState
@@ -39,12 +40,9 @@ class AuthActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setContentView(ActivityAuthBinding.inflate(layoutInflater).also { binding = it }.root)
         if (authViewModel.isUserLoggedIn())
             onAuthComplete()
-        else
-            setContentView(ActivityAuthBinding.inflate(layoutInflater).also { binding = it }.root)
-
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -59,7 +57,9 @@ class AuthActivity : BaseActivity() {
     }
 
     fun setLoading(isLoading: Boolean) {
-        binding.progressbar.isVisible = isLoading
+        if (::binding.isInitialized) {
+            binding.progressbar.isVisible = isLoading
+        }
     }
 
     fun onGoogleAuth() {

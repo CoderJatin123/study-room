@@ -11,5 +11,5 @@ interface AuthRepository {
     suspend fun signup(credential: UserCredential): AuthResult
     fun getGoogleAuthClient(context: Context): GoogleAuth
     fun isUserAvailable(): FirebaseUser?
-    suspend fun logout()
+    suspend fun logout(onComplete:()-> Unit = {})
 }

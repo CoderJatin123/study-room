@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.application.studyroom.R
@@ -98,7 +97,6 @@ class LoginFragment : Fragment() {
 
                     is UiState.Success<FirebaseUser> -> {
                         enableAllFields(true)
-                        (requireActivity() as AuthActivity).onAuthComplete()
                     }
                 }
             }

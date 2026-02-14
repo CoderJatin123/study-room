@@ -57,4 +57,9 @@ class AuthViewModel @Inject constructor(val authRepository: AuthRepository) : Vi
             _loginUiState.emit(uiState)
         }
     }
+
+    fun reset(){
+        _loginUiState.value = UiState.Initial
+        _signupUiState.value = UiState.Initial
+    }
 }
